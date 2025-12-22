@@ -54,16 +54,35 @@ lhcInfoTable = lhcInfoProducer.clone()
 
 nanoTableTaskCommon = cms.Task(
     cms.Task(nanoMetadata),
-    jetPuppiTask, jetPuppiForMETTask, jetAK8Task, jetConstituentsTask,
-    extraFlagsProducersTask, muonTask, tauTask, boostedTauTask,
-    electronTask , lowPtElectronTask, photonTask,
-    vertexTask, isoTrackTask, jetAK8LepTask,  # must be after all the leptons
+    jetPuppiTask, 
+    jetPuppiForMETTask, 
+    jetAK8Task, 
+    jetConstituentsTask,
+    extraFlagsProducersTask, 
+    muonTask, 
+    tauTask, 
+    boostedTauTask,
+    electronTask , 
+    lowPtElectronTask, 
+    photonTask,
+    vertexTask, isoTrackTask, 
+    jetAK8LepTask,  # must be after all the leptons
     softActivityTask,
     cms.Task(linkedObjects),
-    jetPuppiTablesTask, jetAK8TablesTask, jetConstituentsTablesTask,
-    muonTablesTask, fsrTablesTask, tauTablesTask, boostedTauTablesTask,
-    electronTablesTask, lowPtElectronTablesTask, photonTablesTask,
-    globalTablesTask, vertexTablesTask, metTablesTask, extraFlagsTableTask,
+    jetPuppiTablesTask, 
+    jetAK8TablesTask, 
+    jetConstituentsTablesTask,
+    muonTablesTask, 
+    fsrTablesTask, 
+    tauTablesTask, 
+    boostedTauTablesTask,
+    electronTablesTask,
+    lowPtElectronTablesTask, 
+    photonTablesTask,
+    globalTablesTask, 
+    vertexTablesTask, 
+    metTablesTask, 
+    extraFlagsTableTask,
     isoTrackTablesTask,softActivityTablesTask
 )
 
@@ -80,10 +99,25 @@ nanoSequenceOnlyData = cms.Sequence(cms.Sequence(protonTablesTask) + lhcInfoTabl
 nanoSequence = cms.Sequence(nanoSequenceCommon + nanoSequenceOnlyData + nanoSequenceOnlyFullSim)
 
 nanoTableTaskFS = cms.Task(
-    genParticleTask, particleLevelTask, jetMCTask, muonMCTask, electronMCTask, lowPtElectronMCTask, photonMCTask,
-    tauMCTask, boostedTauMCTask,
-    metMCTable, ttbarCatMCProducersTask, globalTablesMCTask, ttbarCategoryTableTask,
-    genWeightsTableTask, genVertexTablesTask, genParticleTablesTask, genProtonTablesTask, particleLevelTablesTask, tauSpinnerTableTask
+    #genParticleTask,
+    particleLevelTask,
+    jetMCTask,
+    muonMCTask,
+    electronMCTask, 
+    lowPtElectronMCTask, 
+    photonMCTask,
+    tauMCTask, 
+    boostedTauMCTask,
+    metMCTable, 
+    #ttbarCatMCProducersTask, 
+    globalTablesMCTask, 
+    # ttbarCategoryTableTask,
+    genWeightsTableTask, 
+    genVertexTablesTask, 
+    # genParticleTablesTask,
+    # genProtonTablesTask, 
+    # particleLevelTablesTask, 
+    # tauSpinnerTableTask
 )
 
 nanoSequenceFS = cms.Sequence(nanoSequenceCommon + cms.Sequence(nanoTableTaskFS))

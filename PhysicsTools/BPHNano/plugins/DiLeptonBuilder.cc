@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include <iostream>
 #include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
@@ -80,8 +80,9 @@ void DiLeptonBuilder<Lepton>::produce(edm::StreamID, edm::Event &evt, edm::Event
 
       pat::CompositeCandidate lepton_pair;
       lepton_pair.setP4(l1_ptr->p4() + l2_ptr->p4());
+
       lepton_pair.setCharge(l1_ptr->charge() + l2_ptr->charge());
-      lepton_pair.addUserFloat("lep_deltaR", reco::deltaR(*l1_ptr, *l2_ptr));
+      lepton_pair.addUserFloat("lep_deltaR_prefit", reco::deltaR(*l1_ptr, *l2_ptr));
 
       // Put the lepton passing the corresponding selection
       lepton_pair.addUserInt("l1_idx", l1_idx);
@@ -92,7 +93,7 @@ void DiLeptonBuilder<Lepton>::produce(edm::StreamID, edm::Event &evt, edm::Event
       lepton_pair.addUserCand("l2", l2_ptr);
       if (!pre_vtx_selection_(lepton_pair))
         continue;  // before making the SV, cut on the info we have
-
+      // std::cout << "[DiLeptonBuilder] Using mass hypotheses: " << l1_ptr->mass() << "  " << l2_ptr->mass() << std::endl;
       KinVtxFitter fitter(
           {ttracks->at(l1_idx), ttracks->at(l2_idx)}, {l1_ptr->mass(), l2_ptr->mass()}, {bph::LEP_SIGMA, bph::LEP_SIGMA}
           // some small sigma for the particle mass
@@ -115,12 +116,24 @@ void DiLeptonBuilder<Lepton>::produce(edm::StreamID, edm::Event &evt, edm::Event
       lepton_pair.addUserFloat("vtx_z", lepton_pair.vz());
       lepton_pair.addUserFloat("cos_theta_2D", bph::cos_theta_2D(fitter, *beamspot, lepton_pair.p4()));
       lepton_pair.addUserFloat("fitted_cos_theta_2D", bph::cos_theta_2D(fitter, *beamspot, fit_p4));
-
+      // add fit pt, eta, phi 
+      lepton_pair.addUserFloat("fitted_pt", fitter.fitted_p4().pt());
+      lepton_pair.addUserFloat("fitted_eta", fitter.fitted_p4().eta());
+      lepton_pair.addUserFloat("fitted_phi", fitter.fitted_p4().phi());
+      // Add delta_R after fit
+      auto daughter_1_p4 = fitter.daughter_p4(0);
+      auto daughter_2_p4 = fitter.daughter_p4(1);
+      lepton_pair.addUserFloat("lep_deltaR_postfit", reco::deltaR(daughter_1_p4, daughter_2_p4));
       auto lxy = bph::l_xy(fitter, *beamspot);
       lepton_pair.addUserFloat("l_xy", lxy.value());
       lepton_pair.addUserFloat("l_xy_unc", lxy.error());
-
+      // Now make an extra fitter where we assume pion mass for the tracks.
+      KinVtxFitter fitter_pi(
+      {ttracks->at(l1_idx), ttracks->at(l2_idx)},{bph::PI_MASS, bph::PI_MASS},{bph::PI_SIGMA, bph::PI_SIGMA}
+      );
+      lepton_pair.addUserFloat("fitted_mass_pion_assumption", fitter_pi.fitted_candidate().mass());
       // cut on the SV info
+
       if (!post_vtx_selection_(lepton_pair))
         continue;
       ret_value->push_back(lepton_pair);

@@ -7,20 +7,19 @@ MuMu = cms.EDProducer(
     'DiMuonBuilder',
     src = cms.InputTag('muonBPH', 'SelectedMuons'),
     transientTracksSrc = cms.InputTag('muonBPH', 'SelectedTransientMuons'),
-    lep1Selection = cms.string('pt > 4.0 && abs(eta) < 2.4 && isLooseMuon && isGlobalMuon'),
-    lep2Selection = cms.string('pt > 3.0 && abs(eta) < 2.4 && isLooseMuon && isGlobalMuon'),
+    lep1Selection = cms.string('pt > 3.0 && abs(eta) < 2.4 && isLooseMuon && isTrackerMuon && userInt("HLT_DoubleMu4_3_LowMass")'),
+    lep2Selection = cms.string('pt > 2.0 && abs(eta) < 2.4 && isLooseMuon && isTrackerMuon && userInt("HLT_DoubleMu4_3_LowMass")'),
     beamSpot = cms.InputTag("offlineBeamSpot"),
     preVtxSelection  = cms.string('abs(userCand("l1").vz - userCand("l2").vz) <= 1.'
-                                  '&& 0 < mass() && mass() < 15.0 '
-                                  '&& charge() == 0'
-                                  '&& userFloat("lep_deltaR") > 0.03'),
-    postVtxSelection = cms.string('0 < userFloat("fitted_mass") && userFloat("fitted_mass") < 15.0'
+                                  '&& 0 < mass() && mass() < 2.0 '
+                                  '&& charge() == 0'),
+    postVtxSelection = cms.string('0 < userFloat("fitted_mass") && userFloat("fitted_mass") < 2.0'
                                   '&& userFloat("sv_prob") > 0.001')
 )
 
 CountDiMuonBPH = cms.EDFilter("PATCandViewCountFilter",
     minNumber = cms.uint32(1),
-    maxNumber = cms.uint32(999999),
+    maxNumber = cms.uint32(1),
     src = cms.InputTag("MuMu:SelectedDiLeptons")
 )  
 
@@ -46,9 +45,15 @@ MuMuTable = cms.EDProducer("SimpleCompositeCandidateFlatTableProducer",
         vtx_z = Var("userFloat('vtx_z')", float, doc="Vtx position in y", precision=12),
         cos2D     = Var("userFloat('cos_theta_2D')", float, doc = "cos 2D of pre-fit candidate wrt beamspot", precision=12),
         fit_cos2D = Var("userFloat('fitted_cos_theta_2D')", float, doc = "cos 2D of fitted vertex wrt beamspot"),
-
+        #extra variables added
+        deltaR_prefit  = Var("userFloat('lep_deltaR_prefit')",  float, doc="DeltaR between leptons before vertex fit"),
+        deltaR_postfit = Var("userFloat('lep_deltaR_postfit')", float, doc="DeltaR between leptons after vertex fit"),
+        fit_pt  = Var("userFloat('fitted_pt')",  float, doc="Post-fit dilepton transverse momentum"),
+        fit_eta = Var("userFloat('fitted_eta')", float, doc="Post-fit dilepton pseudorapidity"),
+        fit_phi = Var("userFloat('fitted_phi')", float,doc="Post-fit dilepton azimuthal angle"),
+        fit_mass_pion = Var("userFloat('fitted_mass_pion_assumption')", float, doc="Fitted dilepton mass assuming pion mass for both tracks"),
     )
 )
 
-MuMuSequence = cms.Sequence(MuMu)
+MuMuSequence = cms.Sequence(MuMu + CountDiMuonBPH)
 MuMuTables = cms.Sequence(MuMuTable)

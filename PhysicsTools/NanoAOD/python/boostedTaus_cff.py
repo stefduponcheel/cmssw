@@ -9,8 +9,8 @@ from PhysicsTools.NanoAOD.taus_cff import _tauIdWPMask, tausMCMatchLepTauForTabl
 
 
 finalBoostedTaus = cms.EDFilter("PATTauRefSelector",
-    src = cms.InputTag("slimmedTausBoosted"),
-    cut = cms.string("pt > 25 && tauID('decayModeFindingNewDMs') && (tauID('byVVLooseIsolationMVArun2DBoldDMwLT') || tauID('byVVLooseIsolationMVArun2DBnewDMwLT') || tauID('byBoostedDeepTau20161718v2p0VSjetraw') > {})".format(0.82))
+    src = cms.InputTag("slimmedTausBoosted"), #  || tauID('byBoostedDeepTau20161718v2p0VSjetraw')  cut = cms.string("pt > 25 && tauID('decayModeFindingNewDMs') && (tauID('byVVLooseIsolationMVArun2DBoldDMwLT') || tauID('byVVLooseIsolationMVArun2DBnewDMwLT') > {})".format(0.82))
+    cut = cms.string("")
 )
 
 boostedTauTable = simplePATTauFlatTableProducer.clone(
@@ -65,7 +65,7 @@ boostedTauTable.variables = cms.PSet(
     _boostedTauVarsBase,
     _boostedTauVarsMVAIso,
     _boostedTauVarsAntiEleMVA,
-    _boostedDeepTauRunIIv2p0Vars
+   #_boostedDeepTauRunIIv2p0Vars
 )
 
 boostedTausMCMatchLepTauForTable = tausMCMatchLepTauForTable.clone(

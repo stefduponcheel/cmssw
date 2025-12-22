@@ -180,7 +180,7 @@ run2_egamma.toModify(
 
 finalPhotons = cms.EDFilter("PATPhotonRefSelector",
     src = cms.InputTag("slimmedPhotonsWithUserData"),
-    cut = cms.string("pt > 5 ")
+    cut = cms.string("pt > 0 ")
 )
 
 photonTable = simplePATPhotonFlatTableProducer.clone(

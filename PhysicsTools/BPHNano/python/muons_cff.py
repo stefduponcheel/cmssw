@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoAOD.common_cff import *
 from PhysicsTools.NanoAOD.simplePATMuonFlatTableProducer_cfi import simplePATMuonFlatTableProducer
 
-Path=["HLT_DoubleMu4_LowMass_Displaced","HLT_DoubleMu4_3_LowMass","HLT_Mu8","HLT_Mu3_PFJet40","HLT_Mu4_L1DoubleMu","HLT_Mu0_L1DoubleMu"]
+Path=["HLT_DoubleMu4_3_LowMass"]
 
 # Takes slimmedMuons, apply basic preselection and trigger match. Devides muon in
 # SelectedMuons (trigger matched) and AllMuons collections
@@ -12,7 +12,7 @@ muonBPH = cms.EDProducer("MuonTriggerSelector",
     prescales      = cms.InputTag("patTrigger"),
     objects        = cms.InputTag("slimmedPatTrigger"),
     maxdR_matching = cms.double(0.3), # For the output trigger matched collection
-    muonSelection  = cms.string("pt > 3 && abs(eta) < 2.4"), # Preselection
+    muonSelection  = cms.string("pt > 2 && abs(eta) < 2.4"), # Preselection
     HLTPaths       = cms.vstring(Path)
 )
 
@@ -34,13 +34,13 @@ TrgMatchMuonTable = simplePATMuonFlatTableProducer.clone(
     extension = cms.bool(False), # this is the main table for the muons
     variables = cms.PSet(
         CandVars,
-        ptErr   = Var("bestTrack().ptError()", float, doc="ptError of the muon track", precision=12),
-        covQopQop = Var("bestTrack().covariance(0, 0)", float, doc="Cov of q/p with q/p", precision=12),
-        covLamLam = Var("bestTrack().covariance(1, 1)", float, doc="Cov of lambda with lambda", precision=12),
-        covPhiPhi = Var("bestTrack().covariance(2, 2)", float, doc="Cov of phi with phi", precision=12),
-        covQopLam = Var("bestTrack().covariance(0, 1)", float, doc="Cov of q/p with lambda", precision=12),
-        covQopPhi = Var("bestTrack().covariance(0, 2)", float, doc="Cov of q/p with phi", precision=12),
-        covLamPhi = Var("bestTrack().covariance(1, 2)", float, doc="Cov of lambda with phi", precision=12),
+        #ptErr   = Var("bestTrack().ptError()", float, doc="ptError of the muon track", precision=12),
+        #covQopQop = Var("bestTrack().covariance(0, 0)", float, doc="Cov of q/p with q/p", precision=12),
+        #covLamLam = Var("bestTrack().covariance(1, 1)", float, doc="Cov of lambda with lambda", precision=12),
+        #covPhiPhi = Var("bestTrack().covariance(2, 2)", float, doc="Cov of phi with phi", precision=12),
+        #covQopLam = Var("bestTrack().covariance(0, 1)", float, doc="Cov of q/p with lambda", precision=12),
+        #covQopPhi = Var("bestTrack().covariance(0, 2)", float, doc="Cov of q/p with phi", precision=12),
+        #covLamPhi = Var("bestTrack().covariance(1, 2)", float, doc="Cov of lambda with phi", precision=12),
         dz      = Var("dB('PVDZ')", float, doc="dz (with sign) wrt PV[0] [cm]", precision=12),
         dzErr   = Var("abs(edB('PVDZ'))", float, doc="dz uncertainty [cm]", precision=12),
         dxy     = Var("dB('PV2D')", float, doc="dxy (with sign) wrt PV[0] [cm]", precision=12),
@@ -55,19 +55,19 @@ TrgMatchMuonTable = simplePATMuonFlatTableProducer.clone(
         looseId     = Var("passed('CutBasedIdLoose')", bool, doc="cut-based ID, medium WP"),
         mediumId    = Var("passed('CutBasedIdMedium')", bool, doc="cut-based ID, medium WP"),
         # tightId     = Var("passed('CutBasedIdTight')", bool, doc="cut-based ID, tight WP"),
-        triggerIdLoose  = Var("passed('TriggerIdLoose')", bool, doc="TriggerIdLoose ID"),
-        softId = Var("passed('SoftCutBasedId')",bool,doc="soft cut-based ID"),
-        softMvaId = Var("passed('SoftMvaId')",bool,doc="soft MVA ID"),
-        softMva = Var("softMvaValue()",float,doc="soft MVA ID score",precision=6),
+        #triggerIdLoose  = Var("passed('TriggerIdLoose')", bool, doc="TriggerIdLoose ID"),
+        #softId = Var("passed('SoftCutBasedId')",bool,doc="soft cut-based ID"),
+        #softMvaId = Var("passed('SoftMvaId')",bool,doc="soft MVA ID"),
+        #softMva = Var("softMvaValue()",float,doc="soft MVA ID score",precision=6),
         softMvaRun3 = Var("softMvaRun3Value()",float,doc="soft MVA Run3 ID score",precision=6),
         isTriggering    = Var("userInt('isTriggering')", bool, doc="flag the reco muon if matched to HLT object"),
         matched_dr      = Var("userFloat('trgDR')", float, doc="dr with the matched triggering muon", precision=12),
         matched_dpt     = Var("userFloat('trgDPT')", float, doc="dpt/pt with the matched triggering muon", precision=12), #comma
-        fired_HLT_DoubleMu4_LowMass_Displaced = Var("userInt('HLT_DoubleMu4_LowMass_Displaced')", int, doc="reco muon fired this trigger"),
-        fired_HLT_Mu8 = Var("userInt('HLT_Mu8')", int, doc="reco muon fired this trigger"),
-        fired_HLT_Mu3_PFJet40 = Var("userInt('HLT_Mu3_PFJet40')", int, doc="reco muon fired this trigger"),
-        fired_HLT_Mu4_L1DoubleMu = Var("userInt('HLT_Mu4_L1DoubleMu')", int, doc="reco muon fired this trigger"),
-        fired_HLT_Mu0_L1DoubleMu = Var("userInt('HLT_Mu0_L1DoubleMu')", int, doc="reco muon fired this trigger"),
+        #fired_HLT_DoubleMu4_LowMass_Displaced = Var("userInt('HLT_DoubleMu4_LowMass_Displaced')", int, doc="reco muon fired this trigger"),
+        #fired_HLT_Mu8 = Var("userInt('HLT_Mu8')", int, doc="reco muon fired this trigger"),
+        #fired_HLT_Mu3_PFJet40 = Var("userInt('HLT_Mu3_PFJet40')", int, doc="reco muon fired this trigger"),
+        #fired_HLT_Mu4_L1DoubleMu = Var("userInt('HLT_Mu4_L1DoubleMu')", int, doc="reco muon fired this trigger"),
+        #fired_HLT_Mu0_L1DoubleMu = Var("userInt('HLT_Mu0_L1DoubleMu')", int, doc="reco muon fired this trigger"),
         fired_HLT_DoubleMu4_3_LowMass = Var("userInt('HLT_DoubleMu4_3_LowMass')", int, doc="reco muon fired this trigger"),
     ),
 )
@@ -75,7 +75,7 @@ TrgMatchMuonTable = simplePATMuonFlatTableProducer.clone(
 # Producer for MC matching
 muonBPHMCMatch = cms.EDProducer("MCMatcher",                  # cut on deltaR, deltaPt/Pt; pick best by deltaR
     src         = TrgMatchMuonTable.src,                      # final reco collection
-    matched     = cms.InputTag("finalGenParticlesBPH"),       # final mc-truth particle collection
+    matched     = cms.InputTag("mergedGenParticles"),       # final mc-truth particle collection
     mcPdgId     = cms.vint32(13),                             # one or more PDG ID (13 = mu); absolute values (see below)
     checkCharge = cms.bool(False),                            # True = require RECO and MC objects to have the same charge
     mcStatus    = cms.vint32(1),                              # PYTHIA status code (1 = stable, 2 = shower, 3 = hard scattering)

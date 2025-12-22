@@ -39,13 +39,13 @@ def ExtVar(tag, valtype, doc=None, precision=-1):
 
 PTVars = cms.PSet(
     pt  = Var("pt",  float, precision=-1),
-    phi = Var("phi", float, precision=12),
+    phi = Var("phi", float, precision=-1),
 )
 P3Vars = cms.PSet(PTVars,
-    eta  = Var("eta",  float,precision=12),
+    eta  = Var("eta",  float,precision=-1),
 )
 P4Vars = cms.PSet(P3Vars,
-    mass = Var("mass", float,precision=10),
+    mass = Var("mass", float,precision=-1),
 )
 CandVars = cms.PSet(P4Vars,
     pdgId  = Var("pdgId", int, doc="PDG code assigned by the event reconstruction (not by MC truth)"),
