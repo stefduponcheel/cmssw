@@ -14,10 +14,23 @@ packedPFphotonTables = cms.EDProducer(
     doc  = cms.string("PF photons near dimuon (from packedPFCandidates)"),
     singleton = cms.bool(False),
     extension = cms.bool(False),
-    variables = cms.PSet(pt  = cms.PSet(expr = cms.string("pt()"),  type = cms.string("float"),  doc = cms.string("pT")),
-
-    )
-    
+    variables = cms.PSet(
+        pt = Var("pt", float),
+        eta = Var("eta", float),
+        phi = Var("phi", float),
+    ),
+    externalVariables = cms.PSet(PhotonPfIso03 = cms.PSet(
+            src  = cms.InputTag("getPackedPFphotons", "PhotonPfIso03"),
+            type = cms.string("double"), 
+            doc  = cms.string("PF isolation (dR<0.3)/pt"),
+        ),
+        PhotonDr = cms.PSet(
+            src  = cms.InputTag("getPackedPFphotons", "PhotonDr"),
+            type = cms.string("double"),  
+            doc  = cms.string("dR between photon and dimuon"),
+        ),
+  )
 )
+
 getPackedPFphotonsSequence = cms.Sequence(getPackedPFphotons)
 packedPFphotonTable = cms.Sequence(packedPFphotonTables)

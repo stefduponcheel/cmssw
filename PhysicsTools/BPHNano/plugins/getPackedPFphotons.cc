@@ -18,6 +18,7 @@
 
 #include "DataFormats/Common/interface/ValueMap.h"
 // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATUserData
+// No addUserData for pat::PackedCandidate, so we create a ValueMap instead. This produces external variables that need to be read into the flat table.
 class getPackedPFphotons : public edm::stream::EDProducer<> 
 {
     public: 
@@ -73,6 +74,7 @@ void getPackedPFphotons::produce(edm::Event& iEvent, const edm::EventSetup&)
         for (const auto& pf : *pfCands)
         {
             if (pf.pdgId() !=22) continue; //Only photons
+            // Askin meeting about whether or not to do a pt cut here. For now, I won't.
             double dR = reco::deltaR(dimuon.eta(), dimuon.phi(), pf.eta(), pf.phi());
             if (dR <0.5)
             {

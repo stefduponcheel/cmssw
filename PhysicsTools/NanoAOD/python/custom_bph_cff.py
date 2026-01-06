@@ -20,6 +20,8 @@ from PhysicsTools.BPHNano.BToV0TrkLL_cff import *
 from PhysicsTools.BPHNano.pverticesBPH_cff import *
 #for the merged gen particles:
 from PhysicsTools.NanoAOD.particlelevel_cff import *
+#PackedPF photons
+from PhysicsTools.BPHNano.getPackedPFphotons_cff import *
 def nanoAOD_customizeMC(process):
     process.load('PhysicsTools.BPHNano.particlelevelBPH_cff')
     process.load('PhysicsTools.BPHNano.genparticlesBPH_cff')
@@ -106,11 +108,12 @@ def nanoAOD_customizeBPH(process):
     process.load('PhysicsTools.BPHNano.triggering_cff')
     process.load('PhysicsTools.NanoAOD.particlelevel_cff')
     process.load('PhysicsTools.BPHNano.NewGenMatcher_cff')
+    process.load('PhysicsTools.BPHNano.getPackedPFphotons_cff')
     # process.load('PhysicsTools.BPHNano.BToV0LL_cff')
     # process.load('PhysicsTools.BPHNano.V0_cff')
     # process.load('PhysicsTools.BPHNano.BToV0TrkLL_cff')
     # process.nanoSequenceMC = cms.Sequence(TriggerSequence + genParticleBPHSequence + genParticleBPHTables + muonBPHSequenceMC + muonBPHTablesMC+ MuMuSequence + MuMuTables + BPHPrimaryVerticesSequence + process.nanoSequenceMC )
-    process.nanoSequenceMC = cms.Sequence(TriggerSequence + cms.Sequence(particleLevelTask) +  muonBPHSequence + MuMuSequence + MuMuTable + muonBPHTables + NewGenMatcherSequence + NewGenMatcherTables)
+    process.nanoSequenceMC = cms.Sequence(TriggerSequence + cms.Sequence(particleLevelTask) + muonBPHSequence + MuMuSequence + MuMuTables + getPackedPFphotonsSequence + packedPFphotonTable)# muonBPHSequence + MuMuSequence + MuMuTable + muonBPHTables + NewGenMatcherSequence + NewGenMatcherTables)
     
     # process.nanoSequenceMC = cms.Sequence(cms.Sequence(particleLevelTask) + genParticleBPHSequence +genParticleBPHTables + muonBPHSequenceMC +muonBPHTablesMC+  MuMuSequence + MuMuTables + MuMuAncestorSequence + MuMuAncestorTables)  #Need to do trigger sequence
                                          #tracksBPHSequenceMC + tracksBPHTablesMC + BToKMuMuSequence + BToKMuMuTables + DiTrackSequence + BToTrkTrkMuMuSequence + BToTrkTrkMuMuTables + KshortToPiPiSequenceMC + KshortToPiPiTablesMC + BToKshortMuMuSequence + BToKshortMuMuTables +  LambdaToProtonPiSequenceMC + LambdaToProtonPiTablesMC + LambdabToLambdaMuMuSequence + LambdabToLambdaMuMuTables + BToChargedKstarMuMuSequence + BToChargedKstarsMuMuTable + XibToXiMuMuSequence + XibToXiMuMuTable)
