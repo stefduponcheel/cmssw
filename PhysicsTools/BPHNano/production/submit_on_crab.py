@@ -21,7 +21,7 @@ from CRABClient.UserUtilities import config
 from multiprocessing import Process
 
 
-production_tag = datetime.date.today().strftime('%Y%b%d_MC')
+production_tag = datetime.date.today().strftime('%Y%b%d_CombinatorialV4')
 
 
 def parse_args():
@@ -120,8 +120,8 @@ if __name__ == '__main__':
 
             config_.JobType.pluginName = 'Analysis'
             config_.JobType.psetName = args.psetcfg
-            config_.JobType.maxJobRuntimeMin = 2500  #can not use with Automatic 
-            config_.JobType.maxMemoryMB = 3000 # 10/10/2025: Increased the maxmemory for a job
+            config_.JobType.maxJobRuntimeMin = 1000  #can not use with Automatic 
+            config_.JobType.maxMemoryMB = 2500 # 10/10/2025: Increased the maxmemory for a job
             config_.JobType.allowUndistributedCMSSW = True
             config_.JobType.inputFiles = args.extra
 
@@ -167,7 +167,7 @@ if __name__ == '__main__':
                     'decay=%s' % decay,
                     'maxEvents=%s' % maxevents,
                  ]
-                config_.Data.totalUnits = 1500
+                config_.Data.totalUnits = 150
                 config_.Data.unitsPerJob = 150
                 if args.test:
                     print('Testing')

@@ -42,14 +42,13 @@ private:
     bool hasExtra() const { return extra != nullptr; } // Mainly debugging purposes
     };
 
-    struct MuFromKaon {
-    const reco::Candidate* genMu;
-    const reco::Candidate* kaon;
-    };
-
     bool matchMuon(const pat::Muon& reco,const reco::Candidate& gen,bool debug,const std::string& tag) const;
+    bool findMatchMuon(const pat::Muon& reco,const reco::GenParticleCollection& gens) const; // Function to find a gen match with reco muon for combinatorial background studies
+    const reco::Candidate* getAncestor(const reco::Candidate* gen) const; // Get the first non-muon ancestor of a given gen. muon
+    void printAncestorChain(const reco::Candidate* gen) const;
+    const reco::Candidate* findBestGenMuonMatch(const pat::Muon& reco,const reco::GenParticleCollection& gens) const;
 
-    const reco::Candidate* getAncestor(const reco::Candidate* gen, int lepId=13) const; // Get the first non-muon ancestor of a given gen. muon
+
     //Token:
     edm::EDGetTokenT<std::vector<pat::Muon>> muonToken_;
     edm::EDGetTokenT<std::vector<pat::CompositeCandidate>> mumuToken_;
@@ -89,15 +88,69 @@ bool NewGenMatcher::matchMuon(const pat::Muon& reco,
 
     return true;
 }
-const reco::Candidate* NewGenMatcher::getAncestor(const reco::Candidate* gen, int lepId) const
+bool NewGenMatcher::findMatchMuon(const pat::Muon& reco,const reco::GenParticleCollection& gens) const
+{
+    for (const auto& gp: gens){
+        if (std::abs(gp.pdgId()) != 13 ) continue;
+        if (gp.status() != 1) continue;
+        if (matchMuon(reco, gp, false, "findMatchMuon")) {
+            return true;
+        }
+    }
+    return false;
+}
+const reco::Candidate* NewGenMatcher::getAncestor(const reco::Candidate* gen) const
 {
     if (!gen || gen->numberOfMothers() == 0)return nullptr;
 
-    const reco::Candidate* mother = gen->mother();
+    const reco::Candidate* mother = gen->mother(0);
+    if (!mother) return nullptr;
     int motherId = std::abs(mother->pdgId());
-
-    if (motherId == lepId) return getAncestor(mother,lepId);
+    double motherpt = mother->pt();
+    if (motherId == 13 || motherpt < 1e-10){
+        return getAncestor(mother);
+    }
     return mother;
+}
+
+void NewGenMatcher::printAncestorChain(const reco::Candidate* gen) const
+{
+    if (!gen) return;
+
+    std::cout << "    pdgId=" << gen->pdgId()
+              << " status=" << gen->status()
+              << " pt=" << gen->pt()
+              << " eta=" << gen->eta()
+              << " phi=" << gen->phi()
+              << " nMothers=" << gen->numberOfMothers()
+              << "\n";
+
+    if (gen->numberOfMothers() == 0) return;
+
+    const reco::Candidate* mother = gen->mother(0);
+
+    printAncestorChain(mother);
+}
+const reco::Candidate* NewGenMatcher::findBestGenMuonMatch(
+    const pat::Muon& reco,
+    const reco::GenParticleCollection& gens) const
+{
+    const reco::Candidate* best = nullptr;
+    double bestDR = 1e9;
+
+    for (const auto& gp : gens) {
+        if (gp.status() != 1) continue;   
+        if (std::abs(gp.pdgId()) != 13) continue;
+
+        if (!matchMuon(reco, gp, false, "findBestGenMuonMatch")) continue;
+
+        double dR = reco::deltaR(reco.eta(), reco.phi(), gp.eta(), gp.phi());
+        if (dR < bestDR) {
+            bestDR = dR;
+            best = &gp;
+        }
+    }
+    return best;
 }
 void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
 {
@@ -112,33 +165,11 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
 
     auto out = std::make_unique<std::vector<pat::CompositeCandidate>>();
     out->reserve(dimuons->size());
-    for (size_t i = 0; i < muons->size(); ++i) {
-
-        const pat::Muon& mu = (*muons)[i];
-
-        if (!mu.genParticle()) continue;
-
-        const reco::Candidate* gen = mu.genParticle();
-
-        if (debug_) {
-            std::cout << "[MUON GEN MATCH] "
-                    << "i=" << i
-                    << " reco(pt=" << mu.pt()
-                    << ", eta=" << mu.eta()
-                    << ", phi=" << mu.phi()
-                    << ")"
-                    << " <- gen(pdgId=" << gen->pdgId()
-                    << ", status=" << gen->status()
-                    << ", pt=" << gen->pt()
-                    << ", eta=" << gen->eta()
-                    << ")\n";
-        }
-    }
     // ==========================================================
     // Phase 1: find all mu mu decays at GEN level
     // ==========================================================
     std::vector<DimuDecay> decays;
-    std::vector<MuFromKaon> muFromKaons;
+
     for (const auto& p : *genParticles)
     {
         int pid = std::abs(p.pdgId());
@@ -175,6 +206,7 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
                 photon = dau;
             }
         }
+
         if (muDaughters.size() != 2){continue;}
         DimuDecay decay;
         decay.mother = &p;
@@ -232,38 +264,8 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
     } 
     bool genDecayExists = (!decays.empty());
     std::vector<bool> decayUsed(decays.size(), false);
-    // Collect muons originating from a Kaon decay
-    std::vector<const reco::Candidate*> genMuFromKaons;
     // Collect Kaons from phi to KK
     std::vector<const reco::Candidate*> genKaonsFromPhi;
-
-    for (const auto& p : *genParticles) {
-
-        int pid = std::abs(p.pdgId());
-        if (pid != 321 || p.status() != 2) continue;
-        if (debug_) {
-        std::cout << "\nFound charged kaon pdgId=" << p.pdgId()
-                  << " status=" << p.status()
-                  << " pt=" << p.pt()
-                  << " with " << p.numberOfDaughters()
-                  << " daughters\n";
-        }
-        // Loop over kaon daughters
-        for (size_t d = 0; d < p.numberOfDaughters(); ++d) {
-            const reco::Candidate* dau = p.daughter(d);
-            if (!dau) continue;
-            // Select final-state muons
-            if (std::abs(dau->pdgId()) == 13 && dau->status() == 1)
-            {
-                genMuFromKaons.push_back(dau);
-                if (debug_)
-                {
-                    std::cout << "    >>> STORED GEN muon from kaon "<< "(charge=" << dau->charge() << ")\n";
-                }
-            }
-
-        }
-    }
     for (const auto& p : *genParticles)
     {
         if (std::abs(p.pdgId()) != 333) continue; // φ
@@ -284,9 +286,6 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
     std::cout << "Stored " << genKaonsFromPhi.size()
               << " charged kaons from φ\n\n";
     }   
-    if (debug_) {
-        std::cout << "\n=== Total GEN muons from charged kaons: "<< genMuFromKaons.size() << " ===\n\n";
-    }
     for (const auto& cand : *dimuons) 
     {
         pat::CompositeCandidate newCand{cand};
@@ -312,6 +311,11 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
 
         int matchedToGenDecay = 0;
         int unmatchedButGenExists = 0;
+
+        int from_KK = 0;
+        int sameOrigin = 0;
+        int trueCombinatorial = 0;
+        int originValid = 0;
         // --- reco muons ---
         int idx1 = cand.userInt("l1_idx");
         int idx2 = cand.userInt("l2_idx");
@@ -406,41 +410,70 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
             }
         }
         // Here we do KK matching:
-
-        int from_KK = 0;
         if (!matched)
         {
-            if (mu1.genParticle() && mu2.genParticle()) {
-            const reco::Candidate* g1 = mu1.genParticle();
-            const reco::Candidate* g2 = mu2.genParticle();
-            if (debug_) {
-                std::cout << "  [KK MIS-ID] dimuon tagged as fromKK\n";
+            // Idea for KKtoMuMu background: Identify Kaons from phi to KK and try to match these gen. Kaons with the reco muons from the MuMu pair
+            for (size_t i = 0; i + 1 < genKaonsFromPhi.size(); i += 2) {
 
-                std::cout << "    reco mu1: pt=" << mu1.pt()
-                          << " eta=" << mu1.eta()
-                          << " phi=" << mu1.phi()
-                          << " charge=" << mu1.charge() << "\n";
+                const reco::Candidate* k1 = genKaonsFromPhi[i];
+                const reco::Candidate* k2 = genKaonsFromPhi[i + 1];
 
-                std::cout << "      gen match: pdgId=" << g1->pdgId()
-                          << " status=" << g1->status()
-                          << " pt=" << g1->pt()
-                          << " eta=" << g1->eta()
-                          << " phi=" << g1->phi() << "\n";
+                bool direct =
+                    matchMuon(mu1, *k1, debug_, "KK direct mu1-k1") &&
+                    matchMuon(mu2, *k2, debug_, "KK direct mu2-k2");
 
-                std::cout << "    reco mu2: pt=" << mu2.pt()
-                          << " eta=" << mu2.eta()
-                          << " phi=" << mu2.phi()
-                          << " charge=" << mu2.charge() << "\n";
+                bool swapped =
+                    matchMuon(mu1, *k2, debug_, "KK swap mu1-k2") &&
+                    matchMuon(mu2, *k1, debug_, "KK swap mu2-k1");
 
-                std::cout << "      gen match: pdgId=" << g2->pdgId()
-                          << " status=" << g2->status()
-                          << " pt=" << g2->pt()
-                          << " eta=" << g2->eta()
-                          << " phi=" << g2->phi() << "\n";
+                if (direct || swapped) {
+                    from_KK = 1;
+
+                    if (debug_) {
+                        std::cout << "  --> MATCHED dimuon to KK at kaon-pair index "<< i;
+                    }
+                    break; 
                 }
             }
         }
+        // For combinatorial background. Add two categories. One that is events where both muons are truth matched but not to the same decay or one we are not interested in, 
+        // and another is where only one of the two is matched, maybe also category where noone is matched?
 
+        int mu1_genMatched = findMatchMuon(mu1, *genParticles) ? 1 : 0;
+        int mu2_genMatched = findMatchMuon(mu2, *genParticles) ? 1 : 0;
+
+        int pair_bothGenMatched = (mu1_genMatched && mu2_genMatched) ? 1 : 0;
+        int pair_oneGenMatched  = ((mu1_genMatched + mu2_genMatched) == 1) ? 1 : 0;
+        int pair_noGenMatched   = (!mu1_genMatched && !mu2_genMatched) ? 1 : 0;
+
+        int isModeled = (fromEta || fromOmega_MuMuPi0 || fromOmega_MuMu || fromPhi || fromRho || fromEtaPrime || from_KK) ? 1 : 0;        
+        int matchedButOther = (pair_bothGenMatched && !isModeled) ? 1 : 0;
+
+        if (matchedButOther)
+        {   
+            const reco::Candidate* genMu1 = findBestGenMuonMatch(mu1, *genParticles);
+            const reco::Candidate* genMu2 = findBestGenMuonMatch(mu2, *genParticles);
+            std::cout << "\n[DEBUG] Ancestry for matched-but-other dimuon\n";
+            std::cout << "  genMu1:\n";
+            printAncestorChain(genMu1);
+            std::cout << "  genMu2:\n";
+            printAncestorChain(genMu2);
+            const reco::Candidate* a1 = genMu1 ? getAncestor(genMu1) : nullptr;
+            const reco::Candidate* a2 = genMu2 ? getAncestor(genMu2) : nullptr;
+
+            originValid = (a1 && a2) ? 1 : 0;
+            sameOrigin = (a1 && a2 && a1 == a2) ? 1 : 0;
+
+            trueCombinatorial = (pair_bothGenMatched && originValid && !sameOrigin) ? 1 : 0;
+            if (debug_) {
+                std::cout << "  [ORIGIN] a1=" << (a1 ? a1->pdgId() : 0)
+                  << " a2=" << (a2 ? a2->pdgId() : 0)
+                  << " sameOrigin=" << sameOrigin
+                  << " trueCombinatorial=" << trueCombinatorial
+                  << " originValid= " << originValid
+                  << "\n";
+                }
+        }
         newCand.addUserInt("matchedToGenDecay", matchedToGenDecay);
         newCand.addUserInt("unmatchedButGenExists", unmatchedButGenExists);
         newCand.addUserInt("genDecayExists", genDecayExists ? 1 : 0);
@@ -457,9 +490,21 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         newCand.addUserFloat("etaPhoton_pt",   etaPhoton_pt);
         newCand.addUserFloat("etaPhoton_eta",  etaPhoton_eta);
         newCand.addUserFloat("etaPhoton_phi",  etaPhoton_phi);
+        
+        newCand.addUserInt("from_KK", from_KK);
+
+        newCand.addUserInt("pair_bothGenMatched", pair_bothGenMatched);
+        newCand.addUserInt("pair_oneGenMatched", pair_oneGenMatched);
+        newCand.addUserInt("pair_noGenMatched", pair_noGenMatched);
+        newCand.addUserInt("matchedButOther", matchedButOther);
+
+
+        newCand.addUserInt("sameOrigin", sameOrigin);
+        newCand.addUserInt("trueCombinatorial", trueCombinatorial);
+        newCand.addUserInt("originValid", originValid);
 
         out->push_back(newCand);
-    }
+    }  
     // store final collection
     evt.put(std::move(out), "SelectedMuMuExtended");
 }
