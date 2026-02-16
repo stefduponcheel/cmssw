@@ -42,6 +42,7 @@ MuMuAncestorsTable = cms.EDProducer("SimpleCompositeCandidateFlatTableProducer",
         etaPhoton_pt  = Var("userFloat('etaPhoton_pt')",  float),
         etaPhoton_eta = Var("userFloat('etaPhoton_eta')", float),
         etaPhoton_phi = Var("userFloat('etaPhoton_phi')", float),
+        etaPhoton_DeltaR = Var("userFloat('etaPhoton_DeltaR')", float),
 
         # Combinatorial studies:
         pair_bothGenMatched = Var("userInt('pair_bothGenMatched')", bool),
@@ -52,6 +53,9 @@ MuMuAncestorsTable = cms.EDProducer("SimpleCompositeCandidateFlatTableProducer",
         sameOrigin = Var("userInt('sameOrigin')", bool),
         trueCombinatorial = Var("userInt('trueCombinatorial')", bool),
         originValid = Var("userInt('originValid')", bool),
+
+        origin_1_pgdId =  Var("userInt('origin1_pdgId')", int),
+        origin_2_pgdId =  Var("userInt('origin2_pdgId')", int),
 
     )
 )

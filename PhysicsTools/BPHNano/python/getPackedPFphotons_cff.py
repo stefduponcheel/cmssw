@@ -29,6 +29,11 @@ packedPFphotonTables = cms.EDProducer(
             type = cms.string("double"),  
             doc  = cms.string("dR between photon and dimuon"),
         ),
+        PhotonDimuonMass = cms.PSet(
+            src  = cms.InputTag("getPackedPFphotons", "PhotonDimuonMass"),
+            type = cms.string("double"),  
+            doc  = cms.string("Invariant mass of the dimuon+photon system"),
+        ),
   )
 )
 

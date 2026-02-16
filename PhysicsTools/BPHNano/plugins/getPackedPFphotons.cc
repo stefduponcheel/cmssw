@@ -40,6 +40,7 @@ getPackedPFphotons::getPackedPFphotons(const edm::ParameterSet& cfg)
     produces<pat::PackedCandidateCollection>("PackedPFphotons");
     produces<edm::ValueMap<double>>("PhotonPfIso03");
     produces<edm::ValueMap<double>>("PhotonDr");
+    produces<edm::ValueMap<double>>("PhotonDimuonMass");
 }
 double getPackedPFphotons::photonPfIso03(pat::PackedCandidate pho, edm::Handle<pat::PackedCandidateCollection> pfcands)
 {
@@ -68,35 +69,48 @@ void getPackedPFphotons::produce(edm::Event& iEvent, const edm::EventSetup&)
     auto out = std::make_unique<pat::PackedCandidateCollection>();
     std::vector<double> isoVals;
     std::vector<double> drVals;
+    std::vector<double> mDimuonPhotonVals;
     // Idea is to store all PF photons that have a DR <0.5 w.r.t. the dimuon pair in the event. There is only one dimuon per event in our case which simplifies things. I then want to store the properties of the all the PF photons that pass this criteria.
     for (const auto& dimuon : *dimuons) //Why do we have to do *dimuons here? and not dimuons? Because dimuons is a handle, we need to dereference it to get the actual collection. Handles are like smart pointers that manage access to the data in the event.
-    {
+    {        
+        const auto dimuonP4 = dimuon.p4();
+
         for (const auto& pf : *pfCands)
         {
             if (pf.pdgId() !=22) continue; //Only photons
-            // Askin meeting about whether or not to do a pt cut here. For now, I won't.
-            double dR = reco::deltaR(dimuon.eta(), dimuon.phi(), pf.eta(), pf.phi());
-            if (dR <0.5)
-            {
-                pat::PackedCandidate newPFPhoton {pf};
-                double iso03 = photonPfIso03(pf, pfCands);
-                drVals.push_back(dR);
-                isoVals.push_back(iso03);
-                out->push_back(newPFPhoton);
-            }
+            //pt-cut of 0.5 GeV
+            if (pf.pt()<0.3) continue;
+            double dR = reco::deltaR(dimuon.eta(), dimuon.phi(), pf.eta(), pf.phi()); //TODO: technically should use the variables after the fit, but I forgot.
+            if (dR >= 0.5) continue;            
+            pat::PackedCandidate newPFPhoton {pf};
+            double iso03 = photonPfIso03(pf, pfCands);
+            // Calculate the invariant mass of the dimuon + photon system in hopes that we can see a peak at the eta meson mass
+            auto dimuonPhotonP4 = dimuonP4 + pf.p4();
+            double mDimuonPhoton = dimuonPhotonP4.mass();
+
+            drVals.push_back(dR);
+            isoVals.push_back(iso03);
+            mDimuonPhotonVals.push_back(mDimuonPhoton);
+            out->push_back(newPFPhoton);
+            
         }
     }
     auto outH = iEvent.put(std::move(out), "PackedPFphotons");
     auto isoMap = std::make_unique<edm::ValueMap<double>>();
     auto drMap = std::make_unique<edm::ValueMap<double>>(); 
+    auto mDimuonPhotonMap = std::make_unique<edm::ValueMap<double>>();
     edm::ValueMap<double>::Filler isoFiller(*isoMap);
     edm::ValueMap<double>::Filler drFiller(*drMap);
+    edm::ValueMap<double>::Filler mDimuonPhotonFiller(*mDimuonPhotonMap);
     isoFiller.insert(outH, isoVals.begin(), isoVals.end());
     drFiller.insert(outH,  drVals.begin(),  drVals.end());
+    mDimuonPhotonFiller.insert(outH, mDimuonPhotonVals.begin(), mDimuonPhotonVals.end());
     isoFiller.fill();
     drFiller.fill();
+    mDimuonPhotonFiller.fill();
     iEvent.put(std::move(isoMap), "PhotonPfIso03");
     iEvent.put(std::move(drMap), "PhotonDr");
+    iEvent.put(std::move(mDimuonPhotonMap), "PhotonDimuonMass");
 }
 
 DEFINE_FWK_MODULE(getPackedPFphotons);

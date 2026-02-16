@@ -81,7 +81,7 @@ PVertexBPHTable::PVertexBPHTable(const edm::ParameterSet& params)
 
 {
   produces<nanoaod::FlatTable>("pv");
-  produces<edm::PtrVector<reco::Candidate>>();
+  // produces<edm::PtrVector<reco::Candidate>>();
 }
 
 PVertexBPHTable::~PVertexBPHTable() {
@@ -103,7 +103,7 @@ void PVertexBPHTable::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<pat::CompositeCandidateCollection> dileptons;
   iEvent.getByToken(dileptonToken_, dileptons);
 
-  auto selCandPv = std::make_unique<PtrVector<reco::Candidate>>();
+  // auto selCandPv = std::make_unique<PtrVector<reco::Candidate>>();
   std::vector<float> pvscore, chi2, covXX, covYY, covZZ, covXY, covXZ, covYZ, vx, vy, vz, pt, eta, phi, mass, ndof;
   std::vector<int> charge, ntracks;
 

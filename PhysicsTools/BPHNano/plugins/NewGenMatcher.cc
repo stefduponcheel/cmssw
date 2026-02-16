@@ -47,7 +47,7 @@ private:
     const reco::Candidate* getAncestor(const reco::Candidate* gen) const; // Get the first non-muon ancestor of a given gen. muon
     void printAncestorChain(const reco::Candidate* gen) const;
     const reco::Candidate* findBestGenMuonMatch(const pat::Muon& reco,const reco::GenParticleCollection& gens) const;
-
+    const reco::Candidate* findStatus1MuonDescendant(const reco::Candidate* c) const;
 
     //Token:
     edm::EDGetTokenT<std::vector<pat::Muon>> muonToken_;
@@ -152,6 +152,35 @@ const reco::Candidate* NewGenMatcher::findBestGenMuonMatch(
     }
     return best;
 }
+const reco::Candidate* NewGenMatcher::findStatus1MuonDescendant(const reco::Candidate* c) const
+{
+    if (!c) return nullptr;
+    if (debug_) { std::cout
+                  << "[recurse] pdgId=" << c->pdgId()
+                  << " status=" << c->status()
+                  << " pt=" << c->pt()
+                  << " nDau=" << c->numberOfDaughters()
+                  << "\n";
+    }
+    // Found final muon
+    if (std::abs(c->pdgId()) == 13 && c->status() == 1) {
+        if (debug_) { std::cout << "  --> FOUND status-1 muon\n";}
+        return c;
+    }
+    // Stop when no daughters, i.e. stable:
+    if (c->numberOfDaughters() == 0)
+        return nullptr;
+    // Loop over daughters
+    for (size_t i = 0; i < c->numberOfDaughters(); ++i){
+        const reco::Candidate* dau = c -> daughter(i);
+        if (!dau) continue;
+        const reco::Candidate* found = findStatus1MuonDescendant(dau); 
+        if (found) return found;
+    }
+    return nullptr;
+
+}
+
 void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
 {
     // Get inputs
@@ -197,14 +226,17 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
             if (debug_) { std::cout << " daughter " << d << " pdgId=" << id << " status=" << dau->status() << " pt=" << dau->pt() << " eta=" << dau->eta() << " phi=" << dau->phi() << "\n"; }
 
             if (id == 111 && !pi0) pi0 = dau; // Leave open the possibility for status = 2 !
-            if (dau->status() != 1) continue;
-            if (std::abs(id) == 13 ) {
-                muDaughters.push_back(dau);
-            } else {
-                nExtraStable++;
-                if ( (id == 22) && (isEta || isEtaPrime) && !photon ) //Store the photon as extra particle for eta or eta prime
-                photon = dau;
+            // --- handle muons that are not status 1 but *have* status-1 muon daughters ---
+            if (id == 13)
+            {
+            const reco::Candidate* finalMu = (dau->status() == 1) ? dau : findStatus1MuonDescendant(dau);
+            if (finalMu) muDaughters.push_back(finalMu);
+                continue;
             }
+            if (dau->status() != 1) continue;
+            nExtraStable++;
+            if ( (id == 22) && (isEta || isEtaPrime) && !photon ) //Store the photon as extra particle for eta or eta prime
+                photon = dau;
         }
 
         if (muDaughters.size() != 2){continue;}
@@ -308,6 +340,8 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         float etaPhoton_pt    = -67.f;
         float etaPhoton_eta   = -67.f;
         float etaPhoton_phi   = -67.f;
+        float etaPhoton_DeltaR = -67.f;
+
 
         int matchedToGenDecay = 0;
         int unmatchedButGenExists = 0;
@@ -316,6 +350,9 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         int sameOrigin = 0;
         int trueCombinatorial = 0;
         int originValid = 0;
+        // For origin studies
+        int origin1_pdgId = 0;
+        int origin2_pdgId = 0;
         // --- reco muons ---
         int idx1 = cand.userInt("l1_idx");
         int idx2 = cand.userInt("l2_idx");
@@ -383,6 +420,7 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
                     etaPhoton_pt  = matched->extra->pt();
                     etaPhoton_eta = matched->extra->eta();
                     etaPhoton_phi = matched->extra->phi();
+                    etaPhoton_DeltaR = reco::deltaR(cand.userFloat("fitted_eta"), cand.userFloat("fitted_phi"), matched->extra->eta(), matched->extra->phi());
                     break;
 
                 case DecayKind::OmegaMuMu:
@@ -463,7 +501,9 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
 
             originValid = (a1 && a2) ? 1 : 0;
             sameOrigin = (a1 && a2 && a1 == a2) ? 1 : 0;
-
+            // Explicitly store the pdg ID of the ancestors for later study:
+            origin1_pdgId = a1 ? a1->pdgId() : 0;
+            origin2_pdgId = a2 ? a2->pdgId() : 0;
             trueCombinatorial = (pair_bothGenMatched && originValid && !sameOrigin) ? 1 : 0;
             if (debug_) {
                 std::cout << "  [ORIGIN] a1=" << (a1 ? a1->pdgId() : 0)
@@ -490,8 +530,11 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         newCand.addUserFloat("etaPhoton_pt",   etaPhoton_pt);
         newCand.addUserFloat("etaPhoton_eta",  etaPhoton_eta);
         newCand.addUserFloat("etaPhoton_phi",  etaPhoton_phi);
-        
+        newCand.addUserFloat("etaPhoton_DeltaR", etaPhoton_DeltaR);
+
         newCand.addUserInt("from_KK", from_KK);
+
+        newCand.addUserInt("isModeled", isModeled);
 
         newCand.addUserInt("pair_bothGenMatched", pair_bothGenMatched);
         newCand.addUserInt("pair_oneGenMatched", pair_oneGenMatched);
@@ -502,6 +545,9 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         newCand.addUserInt("sameOrigin", sameOrigin);
         newCand.addUserInt("trueCombinatorial", trueCombinatorial);
         newCand.addUserInt("originValid", originValid);
+
+        newCand.addUserInt("origin1_pdgId", origin1_pdgId);
+        newCand.addUserInt("origin2_pdgId", origin2_pdgId);
 
         out->push_back(newCand);
     }  

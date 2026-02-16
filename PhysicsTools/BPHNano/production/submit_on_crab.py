@@ -21,7 +21,7 @@ from CRABClient.UserUtilities import config
 from multiprocessing import Process
 
 
-production_tag = datetime.date.today().strftime('%Y%b%d_CombinatorialV4')
+production_tag = datetime.date.today().strftime('%Y%b%d_GenPhotonDR')
 
 
 def parse_args():
@@ -167,13 +167,11 @@ if __name__ == '__main__':
                     'decay=%s' % decay,
                     'maxEvents=%s' % maxevents,
                  ]
-                config_.Data.totalUnits = 150
-                config_.Data.unitsPerJob = 150
                 if args.test:
                     print('Testing')
                     config_.Data.unitsPerJob = 1
-
-
+                
+                config_.Data.unitsPerJob = 250
 
                 config_.General.requestName = name
                 config_.JobType.outputFiles = ['MC.root'] # 10/10/2025: Simplified output name

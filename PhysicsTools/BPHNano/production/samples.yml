@@ -1,7 +1,7 @@
 common:
   data:
     lumimask : None 
-    splitting: 30
+    splitting: 150
     globaltag: 150X_dataRun3_Prompt_v1
   mc:
     splitting: 1
@@ -25,8 +25,9 @@ samples:
     #   isMC: False
     #   parts:
     #     - 0
-    #     - 6
-    #     - 7 
+    #     - 5 
+    #     - 6 
+    #     - 7
         
     # 2025C_PromptReco_v2_%d:
     #   dataset: /ParkingDoubleMuonLowMass%d/Run2025C-PromptReco-v2/MINIAOD
