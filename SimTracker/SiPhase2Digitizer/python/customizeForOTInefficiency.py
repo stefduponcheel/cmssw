@@ -73,3 +73,21 @@ def customizeSiPhase2OTInefficiencyTenPercent(process):
         process.SiPhase2OTFakeBadStripsESSource.badComponentsFraction = 0.1 # 10% bad components
 
     return process
+
+def customizeSiPhase2OTInefficiency70Percent(process):
+
+    _commonCustomizeForInefficiency(process)
+ 
+    if hasattr(process,'SiPhase2OTFakeBadStripsESSource') :
+        print("# Adding 70% of randomly generated bad strips")
+        process.SiPhase2OTFakeBadStripsESSource.badComponentsFraction = 0.7 # 70% bad components
+
+    return process
+
+def customizeSiPhase2OTInefficiencyBadModules(process):
+
+    _commonCustomizeForInefficiency(process)
+ 
+    if hasattr(process,'SiPhase2OTFakeBadModulesESSource') :
+        print("# Adding bad modules ESSource")
+    return process

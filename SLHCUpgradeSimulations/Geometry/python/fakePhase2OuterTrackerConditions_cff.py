@@ -26,10 +26,12 @@ import FWCore.ParameterSet.Config as cms
 ## Fake Sim Outer Tracker Lorentz Angle
 ##
 
-from CalibTracker.SiPhase2TrackerESProducers.siPhase2BadStripConfigurableFakeESSource_cfi import siPhase2BadStripConfigurableFakeESSource
-SiPhase2OTFakeBadStripsESSource = siPhase2BadStripConfigurableFakeESSource.clone(seed = 1,
-                                                                                 printDebug = False,
-                                                                                 badComponentsFraction = 0.,
-                                                                                 appendToDataLabel = '')
+# from CalibTracker.SiPhase2TrackerESProducers.siPhase2BadStripConfigurableFakeESSource_cfi import siPhase2BadStripConfigurableFakeESSource
+# SiPhase2OTFakeBadStripsESSource = siPhase2BadStripConfigurableFakeESSource.clone(seed = 1,
+#                                                                                  printDebug = False,
+#                                                                                  badComponentsFraction = 0.7, # Change the fraction to 70%
+#                                                                                  appendToDataLabel = '')
 
-es_prefer_fake_BadStrips = cms.ESPrefer("SiPhase2BadStripConfigurableFakeESSource","SiPhase2OTFakeBadStripsESSource")
+# es_prefer_fake_BadStrips = cms.ESPrefer("SiPhase2BadStripConfigurableFakeESSource","SiPhase2OTFakeBadStripsESSource")
+
+SiPhase2OTFakeBadModulesESSource = cms.ESSource("SiPhase2BadModuleConfigurableFakeESSource")
