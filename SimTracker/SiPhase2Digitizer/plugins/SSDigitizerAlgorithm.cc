@@ -196,21 +196,57 @@ bool SSDigitizerAlgorithm::isAboveThreshold(const digitizerUtility::SimHitInfo* 
 //
 void SSDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
   uint32_t detId = pixdet->geographicalId().rawId();
-
+  LogPrint("SSDigitizerAlgorithm") << "Checking for bad channels in DetId: " << detId;
   signal_map_type& theSignal = _signal[detId];
   signal_map_type signalNew;
 
+  if (theSignal.empty()) {
+    LogPrint("SSDigitizerAlgorithm") << "DetId " << detId << " has empty signal map";
+    return;
+  }
+  int nBefore = 0;
+  for (const auto& s : theSignal) {
+    if (s.second.ampl() > 0.)
+      ++nBefore;
+  }
+  int nKilled = 0;
+
   SiStripBadStrip::Range range = badChannelPayload_->getRange(detId);
+
   for (std::vector<unsigned int>::const_iterator badChannel = range.first; badChannel != range.second; ++badChannel) {
     const auto& firstStrip = badChannelPayload_->decodePhase2(*badChannel).firstStrip;
     const auto& channelRange = badChannelPayload_->decodePhase2(*badChannel).range;
-
+    LogPrint("SSDigitizerAlgorithm") << "Bad channel: " << *badChannel << " first strip: " << firstStrip
+                                  << " range: " << channelRange;
     for (int index = 0; index < channelRange; index++) {
       for (auto& s : theSignal) {
         auto& channel = s.first;
         if (channel == firstStrip + index)
+          {
           s.second.set(0.);
+          ++nKilled;
+          }
       }
     }
   }
+  
+  int nAfter = 0;
+  for (const auto& s : theSignal) {
+    if (s.second.ampl() > 0.)
+      ++nAfter;
+  }
+
+  LogPrint("SSDigitizerAlgorithm") << "DetId " << detId
+                                   << " signal entries before kill = " << nBefore
+                                   << ", killed = " << nKilled
+                                   << ", after kill = " << nAfter;
+                                   
+  if (detId == 412386389) {
+  for (const auto& s : theSignal) {
+    LogPrint("SSDigitizerAlgorithm")
+      << "DetId " << detId
+      << " existing signal channel = " << s.first
+      << " ampl = " << s.second.ampl();
+  }
+}
 }
