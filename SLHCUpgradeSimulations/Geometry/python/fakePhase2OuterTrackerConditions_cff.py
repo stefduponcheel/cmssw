@@ -34,4 +34,11 @@ import FWCore.ParameterSet.Config as cms
 
 # es_prefer_fake_BadStrips = cms.ESPrefer("SiPhase2BadStripConfigurableFakeESSource","SiPhase2OTFakeBadStripsESSource")
 
-SiPhase2OTFakeBadModulesESSource = cms.ESSource("SiPhase2BadModuleConfigurableFakeESSource")
+# SiPhase2OTFakeBadModulesESSource = cms.ESSource("SiPhase2BadModuleConfigurableFakeESSource")
+
+SiPhase2RandomModuleKillingConfigurableFakeESSource = cms.ESSource(
+    "SiPhase2RandomModuleKillingConfigurableFakeESSource",
+    seed = cms.uint32(12345),
+    badModulesFraction = cms.double(0.05),
+    debug = cms.untracked.bool(True)
+)

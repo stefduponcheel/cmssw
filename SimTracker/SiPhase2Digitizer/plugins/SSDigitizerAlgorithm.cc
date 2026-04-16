@@ -217,7 +217,7 @@ void SSDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pix
     const auto& firstStrip = badChannelPayload_->decodePhase2(*badChannel).firstStrip;
     const auto& channelRange = badChannelPayload_->decodePhase2(*badChannel).range;
     LogPrint("SSDigitizerAlgorithm") << "Bad channel: " << *badChannel << " first strip: " << firstStrip
-                                  << " range: " << channelRange;
+                                 << " range: " << channelRange;
     for (int index = 0; index < channelRange; index++) {
       for (auto& s : theSignal) {
         auto& channel = s.first;

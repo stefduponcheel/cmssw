@@ -91,3 +91,17 @@ def customizeSiPhase2OTInefficiencyBadModules(process):
     if hasattr(process,'SiPhase2OTFakeBadModulesESSource') :
         print("# Adding bad modules ESSource")
     return process
+
+def customizeSiPhase2OTInefficiencyKillingRandom2SModules(process):
+    
+    _commonCustomizeForInefficiency(process)
+ 
+    if hasattr(process,'SiPhase2RandomModuleKillingConfigurableFakeESSource') :
+        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.seed = 213124
+        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.badModulesFraction = 1
+        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.debug = True
+        print(f"# Adding random killing of 2S modules with {process.SiPhase2RandomModuleKillingConfigurableFakeESSource.badModulesFraction.value()*100:.0f}% probability")
+
+    else:
+        print("# SiPhase2RandomModuleKillingConfigurableFakeESSource not found, cannot activate random killing of 2S modules")
+    return process  
