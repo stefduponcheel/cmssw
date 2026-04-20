@@ -92,16 +92,35 @@ def customizeSiPhase2OTInefficiencyBadModules(process):
         print("# Adding bad modules ESSource")
     return process
 
-def customizeSiPhase2OTInefficiencyKillingRandom2SModules(process):
-    
+def _customizeRandom2SModuleKilling(process, fraction, seed=213124, debug=False):
     _commonCustomizeForInefficiency(process)
- 
-    if hasattr(process,'SiPhase2RandomModuleKillingConfigurableFakeESSource') :
-        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.seed = 213124
-        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.badModulesFraction = 1
-        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.debug = True
-        print(f"# Adding random killing of 2S modules with {process.SiPhase2RandomModuleKillingConfigurableFakeESSource.badModulesFraction.value()*100:.0f}% probability")
 
+    if hasattr(process, 'SiPhase2RandomModuleKillingConfigurableFakeESSource'):
+        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.seed = cms.uint32(seed)
+        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.badModulesFraction = cms.double(fraction)
+        process.SiPhase2RandomModuleKillingConfigurableFakeESSource.debug = cms.untracked.bool(debug)
+
+        print(f"# Adding random killing of exactly {fraction*100:.0f}% of 2S modules")
     else:
         print("# SiPhase2RandomModuleKillingConfigurableFakeESSource not found, cannot activate random killing of 2S modules")
-    return process  
+
+    return process
+
+
+def customizeSiPhase2OTInefficiencyKillingRandom2SModules5Percent(process):
+    return _customizeRandom2SModuleKilling(process, 0.05)
+
+def customizeSiPhase2OTInefficiencyKillingRandom2SModules10Percent(process):
+    return _customizeRandom2SModuleKilling(process, 0.10)
+
+def customizeSiPhase2OTInefficiencyKillingRandom2SModules20Percent(process):
+    return _customizeRandom2SModuleKilling(process, 0.20)
+
+def customizeSiPhase2OTInefficiencyKillingRandom2SModules30Percent(process):
+    return _customizeRandom2SModuleKilling(process, 0.30)
+
+def customizeSiPhase2OTInefficiencyKillingRandom2SModules50Percent(process):
+    return _customizeRandom2SModuleKilling(process, 0.50)
+
+def customizeSiPhase2OTInefficiencyKillingRandom2SModules70Percent(process):
+    return _customizeRandom2SModuleKilling(process, 0.70)
