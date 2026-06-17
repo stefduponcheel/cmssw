@@ -7,8 +7,9 @@ MuMu = cms.EDProducer(
     'DiMuonBuilder',
     src = cms.InputTag('muonBPH', 'SelectedMuons'),
     transientTracksSrc = cms.InputTag('muonBPH', 'SelectedTransientMuons'),
-    lep1Selection = cms.string('pt > 3.0 && abs(eta) < 2.4 && isLooseMuon && isTrackerMuon && userInt("HLT_DoubleMu4_3_LowMass") == 1'),
-    lep2Selection = cms.string('pt > 2.0 && abs(eta) < 2.4 && isLooseMuon && isTrackerMuon && userInt("HLT_DoubleMu4_3_LowMass") == 1'),
+    pfCandsSrc = cms.InputTag("packedPFCandidates"),
+    lep1Selection = cms.string('pt > 1.0 && abs(eta) < 2.4 && isLooseMuon && isTrackerMuon && userInt("HLT_DoubleMu4_3_LowMass") == 1'),
+    lep2Selection = cms.string('pt > 1.0 && abs(eta) < 2.4 && isLooseMuon && isTrackerMuon && userInt("HLT_DoubleMu4_3_LowMass") == 1'),
     beamSpot = cms.InputTag("offlineBeamSpot"),
     preVtxSelection  = cms.string('abs(userCand("l1").vz - userCand("l2").vz) <= 1.'
                                   '&& 0 < mass() && mass() < 2.0 '
@@ -52,6 +53,10 @@ MuMuTable = cms.EDProducer("SimpleCompositeCandidateFlatTableProducer",
         fit_eta = Var("userFloat('fitted_eta')", float, doc="Post-fit dilepton pseudorapidity"),
         fit_phi = Var("userFloat('fitted_phi')", float,doc="Post-fit dilepton azimuthal angle"),
         fit_mass_pion = Var("userFloat('fitted_mass_pion_assumption')", float, doc="Fitted dilepton mass assuming pion mass for both tracks"),
+        l1_pf_iso03 = Var("userFloat('l1_pf_iso03')", float, doc="PF isolation with cone 0.3 for leading lepton"),
+        l2_pf_iso03 = Var("userFloat('l2_pf_iso03')", float, doc="PF isolation with cone 0.3 for subleading lepton"),
+        l1_pf_iso04 = Var("userFloat('l1_pf_iso04')", float, doc="PF isolation with cone 0.4 for leading lepton"),
+        l2_pf_iso04 = Var("userFloat('l2_pf_iso04')", float, doc="PF isolation with cone 0.4 for subleading lepton"),
     )
 )
 

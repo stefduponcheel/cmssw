@@ -57,6 +57,25 @@ MuMuAncestorsTable = cms.EDProducer("SimpleCompositeCandidateFlatTableProducer",
         origin_1_pgdId =  Var("userInt('origin1_pdgId')", int),
         origin_2_pgdId =  Var("userInt('origin2_pdgId')", int),
 
+        #Gen kinematics:
+        genMuon1_pt = Var("userFloat('genMuon1_pt')", float),
+        genMuon1_eta = Var("userFloat('genMuon1_eta')", float),
+        genMuon1_phi = Var("userFloat('genMuon1_phi')", float),
+        genMuon2_pt = Var("userFloat('genMuon2_pt')", float),
+        genMuon2_eta = Var("userFloat('genMuon2_eta')", float),
+        genMuon2_phi = Var("userFloat('genMuon2_phi')", float),
+        genMother_pt = Var("userFloat('genMother_pt')", float),
+
+
+        #Gen vertex info:
+        genMuon1_vtx_x = Var("userFloat('genMuon1_vtx_x')", float),
+        genMuon1_vtx_y = Var("userFloat('genMuon1_vtx_y')", float),
+        genMuon2_vtx_x = Var("userFloat('genMuon2_vtx_x')", float),
+        genMuon2_vtx_y = Var("userFloat('genMuon2_vtx_y')", float),
+        genMother_vtx_x = Var("userFloat('genMother_vtx_x')",float),
+        genMother_vtx_y = Var("userFloat('genMother_vtx_y')",float),
+        
+
     )
 )
 

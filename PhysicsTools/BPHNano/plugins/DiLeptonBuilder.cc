@@ -19,6 +19,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "KinVtxFitter.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "helper.h"
 
 template <typename Lepton>
@@ -35,7 +36,8 @@ public:
         post_vtx_selection_{cfg.getParameter<std::string>("postVtxSelection")},
         src_{consumes<LeptonCollection>(cfg.getParameter<edm::InputTag>("src"))},
         beamspot_{consumes<reco::BeamSpot>(cfg.getParameter<edm::InputTag>("beamSpot"))},
-        ttracks_src_{consumes<TransientTrackCollection>(cfg.getParameter<edm::InputTag>("transientTracksSrc"))} {
+        ttracks_src_{consumes<TransientTrackCollection>(cfg.getParameter<edm::InputTag>("transientTracksSrc"))},
+        pfcands_src_{consumes<pat::PackedCandidateCollection>(cfg.getParameter<edm::InputTag>("pfCandsSrc"))} {
     produces<pat::CompositeCandidateCollection>("SelectedDiLeptons");
   }
 
@@ -51,6 +53,7 @@ private:
   const edm::EDGetTokenT<LeptonCollection> src_;
   const edm::EDGetTokenT<reco::BeamSpot> beamspot_;
   const edm::EDGetTokenT<TransientTrackCollection> ttracks_src_;
+  const edm::EDGetTokenT<pat::PackedCandidateCollection> pfcands_src_;
 };
 
 template <typename Lepton>
@@ -64,6 +67,9 @@ void DiLeptonBuilder<Lepton>::produce(edm::StreamID, edm::Event &evt, edm::Event
 
   edm::Handle<TransientTrackCollection> ttracks;
   evt.getByToken(ttracks_src_, ttracks);
+
+  edm::Handle<pat::PackedCandidateCollection> pfcands;
+  evt.getByToken(pfcands_src_, pfcands);
 
   // output
   std::unique_ptr<pat::CompositeCandidateCollection> ret_value(new pat::CompositeCandidateCollection());
@@ -133,6 +139,7 @@ void DiLeptonBuilder<Lepton>::produce(edm::StreamID, edm::Event &evt, edm::Event
       );
       lepton_pair.addUserFloat("fitted_mass_pion_assumption", fitter_pi.fitted_candidate().mass());
       // cut on the SV info
+      // PF isolation variables for muons
 
       if (!post_vtx_selection_(lepton_pair))
         continue;
@@ -143,11 +150,12 @@ void DiLeptonBuilder<Lepton>::produce(edm::StreamID, edm::Event &evt, edm::Event
   evt.put(std::move(ret_value), "SelectedDiLeptons");
 }
 
-#include "DataFormats/PatCandidates/interface/Electron.h"
+// #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 typedef DiLeptonBuilder<pat::Muon> DiMuonBuilder;
-typedef DiLeptonBuilder<pat::Electron> DiElectronBuilder;
+// typedef DiLeptonBuilder<pat::Electron> DiElectronBuilder;
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(DiMuonBuilder);
-DEFINE_FWK_MODULE(DiElectronBuilder);
+// DEFINE_FWK_MODULE(DiElectronBuilder);
+//TODO: Isolation currently only works for muons, have to check what to do when we consider electrons

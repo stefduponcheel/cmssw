@@ -12,7 +12,7 @@ muonBPH = cms.EDProducer("MuonTriggerSelector",
     prescales      = cms.InputTag("patTrigger"),
     objects        = cms.InputTag("slimmedPatTrigger"),
     maxdR_matching = cms.double(0.3), # For the output trigger matched collection
-    muonSelection  = cms.string("pt > 2 && abs(eta) < 2.4"), # Preselection
+    muonSelection  = cms.string("pt > 1.0 && abs(eta) < 2.4"), # Preselection
     HLTPaths       = cms.vstring(Path)
 )
 
@@ -47,8 +47,8 @@ TrgMatchMuonTable = simplePATMuonFlatTableProducer.clone(
         dxyErr  = Var("edB('PV2D')", float, doc="dxy uncertainty [cm]"),
         ip3d    = Var("abs(dB('PV3D'))", float, doc="3D impact parameter wrt PV[0] [cm]"),
         sip3d   = Var("abs(dB('PV3D')/edB('PV3D'))", float, doc="3D impact parameter significance wrt PV[0]"),
-        pfRelIso03_all = Var("(pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - pfIsolationR03().sumPUPt/2,0.0))/pt", float, doc="PF relative isolation dR=0.3, total (deltaBeta corrections)", precision=12),
-        pfRelIso04_all = Var("(pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - pfIsolationR04().sumPUPt/2,0.0))/pt", float, doc="PF relative isolation dR=0.4, total (deltaBeta corrections)", precision=12),
+        pfRelIso03_all = Var("(pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - pfIsolationR03().sumPUPt/2,0.0))/pt", float, doc="PF relative isolation dR=0.3, total (deltaBeta corrections)"),
+        pfRelIso04_all = Var("(pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - pfIsolationR04().sumPUPt/2,0.0))/pt", float, doc="PF relative isolation dR=0.4, total (deltaBeta corrections)"),
         isPFcand    = Var("isPFMuon", bool, doc="muon is PF candidate"),
         isGlobal    = Var("isGlobalMuon", bool, doc="muon is global muon"),
         isTracker   = Var("isTrackerMuon", bool, doc="muon is tracker muon"),

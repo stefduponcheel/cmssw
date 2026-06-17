@@ -342,6 +342,20 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         float etaPhoton_phi   = -67.f;
         float etaPhoton_DeltaR = -67.f;
 
+        float genMuon1_pt = -67.f;
+        float genMuon1_eta = -67.f;
+        float genMuon1_phi = -67.f;
+        float genMuon1_vtx_x = -67.f;
+        float genMuon1_vtx_y = -67.f;
+        float genMuon2_pt = -67.f;
+        float genMuon2_eta = -67.f;
+        float genMuon2_phi = -67.f;
+        float genMuon2_vtx_x = -67.f;
+        float genMuon2_vtx_y = -67.f;
+
+        float genMother_vtx_x = -67.f;
+        float genMother_vtx_y = -67.f;
+        float genMother_pt = -67.f;
 
         int matchedToGenDecay = 0;
         int unmatchedButGenExists = 0;
@@ -350,6 +364,9 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         int sameOrigin = 0;
         int trueCombinatorial = 0;
         int originValid = 0;
+
+        bool isSwapped = false;
+
         // For origin studies
         int origin1_pdgId = 0;
         int origin2_pdgId = 0;
@@ -380,6 +397,7 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
                 matched       = &dec;
                 matchedIndex  = i;
                 matchedToGenDecay = 1;
+                isSwapped = swapped; 
 
                 if (debug_) {
                     std::cout << "  --> MATCHED dimuon to PDG " 
@@ -406,6 +424,36 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         if (matched) {
 
             decayUsed[matchedIndex] = true;  // enforce uniqueness
+
+            const reco::Candidate* genMu_forRecoMu1 = nullptr;
+            const reco::Candidate* genMu_forRecoMu2 = nullptr;
+            // Check the swap status
+            if (!isSwapped) {
+                genMu_forRecoMu1 = matched->mu1;
+                genMu_forRecoMu2 = matched->mu2;
+            } else {
+                genMu_forRecoMu1 = matched->mu2;
+                genMu_forRecoMu2 = matched->mu1;
+            }
+
+            if (genMu_forRecoMu1)
+            {
+                genMuon1_pt = genMu_forRecoMu1->pt();
+                genMuon1_eta = genMu_forRecoMu1->eta();
+                genMuon1_phi = genMu_forRecoMu1->phi();
+                genMuon1_vtx_x = genMu_forRecoMu1->vx();
+                genMuon1_vtx_y = genMu_forRecoMu1->vy();
+            }
+            if (genMu_forRecoMu2)            {
+                genMuon2_pt = genMu_forRecoMu2->pt();
+                genMuon2_eta = genMu_forRecoMu2->eta();
+                genMuon2_phi = genMu_forRecoMu2->phi();
+                genMuon2_vtx_x = genMu_forRecoMu2->vx();
+                genMuon2_vtx_y = genMu_forRecoMu2->vy();
+            }
+            genMother_vtx_x = matched->mother->vx();
+            genMother_vtx_y = matched->mother->vy();
+
             switch (matched->kind) {
 
                 case DecayKind::EtaMuMu:
@@ -549,6 +597,21 @@ void NewGenMatcher::produce(edm::Event& evt, const edm::EventSetup&)
         newCand.addUserInt("origin1_pdgId", origin1_pdgId);
         newCand.addUserInt("origin2_pdgId", origin2_pdgId);
 
+        newCand.addUserFloat("genMuon1_pt", genMuon1_pt);
+        newCand.addUserFloat("genMuon1_eta", genMuon1_eta);
+        newCand.addUserFloat("genMuon1_phi", genMuon1_phi);
+        newCand.addUserFloat("genMuon1_vtx_x", genMuon1_vtx_x);
+        newCand.addUserFloat("genMuon1_vtx_y", genMuon1_vtx_y);
+
+        newCand.addUserFloat("genMuon2_pt", genMuon2_pt);
+        newCand.addUserFloat("genMuon2_eta", genMuon2_eta);
+        newCand.addUserFloat("genMuon2_phi", genMuon2_phi);
+        newCand.addUserFloat("genMuon2_vtx_x", genMuon2_vtx_x);
+        newCand.addUserFloat("genMuon2_vtx_y", genMuon2_vtx_y);
+
+        newCand.addUserFloat("genMother_vtx_x", genMother_vtx_x);
+        newCand.addUserFloat("genMother_vtx_y", genMother_vtx_y);
+        newCand.addUserFloat("genMother_pt", genMother_pt);
         out->push_back(newCand);
     }  
     // store final collection

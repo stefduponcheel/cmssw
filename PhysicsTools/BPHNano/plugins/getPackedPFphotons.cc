@@ -80,7 +80,7 @@ void getPackedPFphotons::produce(edm::Event& iEvent, const edm::EventSetup&)
             if (pf.pdgId() !=22) continue; //Only photons
             //pt-cut of 0.5 GeV
             if (pf.pt()<0.3) continue;
-            double dR = reco::deltaR(dimuon.eta(), dimuon.phi(), pf.eta(), pf.phi()); //TODO: technically should use the variables after the fit, but I forgot.
+            double dR = reco::deltaR(dimuon.userFloat("fitted_eta"), dimuon.userFloat("fitted_phi"), pf.eta(), pf.phi()); 
             if (dR >= 0.5) continue;            
             pat::PackedCandidate newPFPhoton {pf};
             double iso03 = photonPfIso03(pf, pfCands);
