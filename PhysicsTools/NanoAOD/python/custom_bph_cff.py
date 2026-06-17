@@ -22,6 +22,11 @@ from PhysicsTools.BPHNano.pverticesBPH_cff import *
 from PhysicsTools.NanoAOD.particlelevel_cff import *
 #PackedPF photons
 from PhysicsTools.BPHNano.getPackedPFphotons_cff import *
+#Gen stuff:
+from PhysicsTools.NanoAOD.genWeightsTable_cfi import *
+from PhysicsTools.NanoAOD.globals_cff import *
+
+
 def nanoAOD_customizeMC(process):
     process.load('PhysicsTools.BPHNano.particlelevelBPH_cff')
     process.load('PhysicsTools.BPHNano.genparticlesBPH_cff')
@@ -109,16 +114,19 @@ def nanoAOD_customizeBPH(process):
     process.load('PhysicsTools.NanoAOD.particlelevel_cff')
     process.load('PhysicsTools.BPHNano.NewGenMatcher_cff')
     process.load('PhysicsTools.BPHNano.getPackedPFphotons_cff')
+    
+    process.load('PhysicsTools.NanoAOD.genWeightsTable_cfi')
+    process.load('PhysicsTools.NanoAOD.globals_cff')
     # process.load('PhysicsTools.BPHNano.BToV0LL_cff')
     # process.load('PhysicsTools.BPHNano.V0_cff')
     # process.load('PhysicsTools.BPHNano.BToV0TrkLL_cff')
     # process.nanoSequenceMC = cms.Sequence(TriggerSequence + genParticleBPHSequence + genParticleBPHTables + muonBPHSequenceMC + muonBPHTablesMC+ MuMuSequence + MuMuTables + BPHPrimaryVerticesSequence + process.nanoSequenceMC )
-    process.nanoSequenceMC = cms.Sequence(TriggerSequence + cms.Sequence(particleLevelTask) + muonBPHSequence + muonBPHTables + MuMuSequence + MuMuTables + getPackedPFphotonsSequence + packedPFphotonTable +  NewGenMatcherSequence + NewGenMatcherTables)# muonBPHSequence + MuMuSequence + MuMuTable + muonBPHTables + NewGenMatcherSequence + NewGenMatcherTables)
+    process.nanoSequenceMC = cms.Sequence(TriggerSequence + cms.Sequence(particleLevelTask) +  cms.Sequence(globalTablesMCTask) +  cms.Sequence(genWeightsTableTask) + muonBPHSequence + muonBPHTables + MuMuSequence + MuMuTables + getPackedPFphotonsSequence + packedPFphotonTable +  NewGenMatcherSequence + NewGenMatcherTables)# muonBPHSequence + MuMuSequence + MuMuTable + muonBPHTables + NewGenMatcherSequence + NewGenMatcherTables)
     
     # process.nanoSequenceMC = cms.Sequence(cms.Sequence(particleLevelTask) + genParticleBPHSequence +genParticleBPHTables + muonBPHSequenceMC +muonBPHTablesMC+  MuMuSequence + MuMuTables + MuMuAncestorSequence + MuMuAncestorTables)  #Need to do trigger sequence
                                          #tracksBPHSequenceMC + tracksBPHTablesMC + BToKMuMuSequence + BToKMuMuTables + DiTrackSequence + BToTrkTrkMuMuSequence + BToTrkTrkMuMuTables + KshortToPiPiSequenceMC + KshortToPiPiTablesMC + BToKshortMuMuSequence + BToKshortMuMuTables +  LambdaToProtonPiSequenceMC + LambdaToProtonPiTablesMC + LambdabToLambdaMuMuSequence + LambdabToLambdaMuMuTables + BToChargedKstarMuMuSequence + BToChargedKstarsMuMuTable + XibToXiMuMuSequence + XibToXiMuMuTable)
 
-    #process.nanoSequence = cms.Sequence(process.nanoSequence + muonBPHSequence + muonBPHTables + MuMuSequence + MuMuTables + tracksBPHSequence +  KshortToPiPiSequence + KshortToPiPiTables + BPHPrimaryVerticesSequence)
+    process.nanoSequence = cms.Sequence(TriggerSequence  +muonBPHSequence + muonBPHTables + MuMuSequence + MuMuTables + BPHPrimaryVerticesSequence +getPackedPFphotonsSequence + packedPFphotonTable) # tracksBPHSequence +  KshortToPiPiSequence + KshortToPiPiTables + )
                                          #tracksBPHSequence + tracksBPHTables + BToKMuMuSequence + BToKMuMuTables + DiTrackSequence + BToTrkTrkMuMuSequence + BToTrkTrkMuMuTables + KshortToPiPiSequence + KshortToPiPiTables + BToKshortMuMuSequence + BToKshortMuMuTables +  LambdaToProtonPiSequence + LambdaToProtonPiTables + LambdabToLambdaMuMuSequence + LambdabToLambdaMuMuTables+BToChargedKstarMuMuSequence+BToChargedKstarsMuMuTable + XibToXiMuMuSequence + XibToXiMuMuTable
                                         
     return process
