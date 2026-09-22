@@ -5,7 +5,7 @@
 #include "FWCore/Utilities/interface/ESGetToken.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "SimTracker/SiPhase2Digitizer/plugins/Phase2TrackerDigitizerAlgorithm.h"
-#include "CondFormats/SiStripObjects/interface/SiStripBadStrip.h"
+#include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
 
 class PSSDigitizerAlgorithm : public Phase2TrackerDigitizerAlgorithm {
 public:
@@ -22,7 +22,7 @@ public:
 private:
   edm::ESGetToken<SiPhase2OuterTrackerLorentzAngle, SiPhase2OuterTrackerLorentzAngleSimRcd> siPhase2OTLorentzAngleToken_;
   const edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
-  edm::ESGetToken<SiStripBadStrip, SiPhase2OuterTrackerBadStripRcd> badChannelToken_;
-  const SiStripBadStrip* badChannelPayload_;
+  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badChannelToken_;
+  const SiPixelQuality* badChannelPayload_;
 };
 #endif

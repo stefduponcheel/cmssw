@@ -20,4 +20,8 @@ class SiPhase2OuterTrackerLorentzAngleSimRcd
 class SiPhase2OuterTrackerBadStripRcd : public edm::eventsetup::DependentRecordImplementation<
                                             SiPhase2OuterTrackerBadStripRcd,
                                             edm::mpl::Vector<TrackerTopologyRcd, TrackerDigiGeometryRecord> > {};
+/*Record for Phase-2 Outer Tracker whole-module dead/alive status (SiPixelQuality, reused generically as
+  a module DetId lookup — see SiPhase2OTFakeQualityESSource for producer and rationale):*/
+class Phase2OTQualityRcd : public edm::eventsetup::DependentRecordImplementation<
+                              Phase2OTQualityRcd, edm::mpl::Vector<TrackerDigiGeometryRecord> > {};
 #endif

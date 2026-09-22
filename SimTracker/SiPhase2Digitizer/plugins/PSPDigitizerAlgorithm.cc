@@ -17,6 +17,9 @@ void PSPDigitizerAlgorithm::init(const edm::EventSetup& es) {
     siPhase2OTLorentzAngle_ = &es.getData(siPhase2OTLorentzAngleToken_);
   }
 
+  if (use_deadmodule_DB_)  // Get module status from DB
+    badChannelPayload_ = &es.getData(badChannelToken_);
+
   geom_ = &es.getData(geomToken_);
 }
 
@@ -29,6 +32,11 @@ PSPDigitizerAlgorithm::PSPDigitizerAlgorithm(const edm::ParameterSet& conf, edm:
           conf.getParameter<ParameterSet>("PSPDigitizerAlgorithm").getParameter<int>("BiasRailInefficiencyFlag")) {
   if (use_LorentzAngle_DB_)
     siPhase2OTLorentzAngleToken_ = iC.esConsumes();
+
+  if (use_deadmodule_DB_) {
+    badChannelToken_ = iC.esConsumes();
+  }
+
   pixelFlag_ = false;
   LogDebug("PSPDigitizerAlgorithm") << "Algorithm constructed "
                                     << "Configuration parameters:"
@@ -80,8 +88,15 @@ bool PSPDigitizerAlgorithm::isInBiasRailRegion(const PSimHit& hit) const {
   return result;
 }
 //
-// -- Read Bad Channels from the Condidion DB and kill channels/module accordingly
+// -- Read module status from the Condition DB and kill the whole module's signal if dead
 //
 void PSPDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
-  // this method is dummy at the moment. Will be implemented once we have the corresponding objectcondition DB
+  uint32_t detId = pixdet->geographicalId().rawId();
+
+  if (!badChannelPayload_->IsModuleUsable(detId)) {
+    signal_map_type& theSignal = _signal[detId];
+    for (auto& s : theSignal) {
+      s.second.set(0.);
+    }
+  }
 }

@@ -32,9 +32,7 @@ PSSDigitizerAlgorithm::PSSDigitizerAlgorithm(const edm::ParameterSet& conf, edm:
     siPhase2OTLorentzAngleToken_ = iC.esConsumes();
 
   if (use_deadmodule_DB_) {
-    std::string badChannelLabel_ = conf.getParameter<ParameterSet>("SSDigitizerAlgorithm")
-                                       .getUntrackedParameter<std::string>("BadChannelLabel", "");
-    badChannelToken_ = iC.esConsumes(edm::ESInputTag{"", badChannelLabel_});
+    badChannelToken_ = iC.esConsumes();
   }
 
   pixelFlag_ = false;
@@ -63,25 +61,15 @@ bool PSSDigitizerAlgorithm::isAboveThreshold(const digitizerUtility::SimHitInfo*
   return (charge >= thr);
 }
 //
-// -- Read Bad Channels from the Condidion DB and kill channels/module accordingly
+// -- Read module status from the Condition DB and kill the whole module's signal if dead
 //
 void PSSDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
   uint32_t detId = pixdet->geographicalId().rawId();
 
-  signal_map_type& theSignal = _signal[detId];
-  signal_map_type signalNew;
-
-  SiStripBadStrip::Range range = badChannelPayload_->getRange(detId);
-  for (std::vector<unsigned int>::const_iterator badChannel = range.first; badChannel != range.second; ++badChannel) {
-    const auto& firstStrip = badChannelPayload_->decodePhase2(*badChannel).firstStrip;
-    const auto& channelRange = badChannelPayload_->decodePhase2(*badChannel).range;
-
-    for (int index = 0; index < channelRange; index++) {
-      for (auto& s : theSignal) {
-        auto& channel = s.first;
-        if (channel == firstStrip + index)
-          s.second.set(0.);
-      }
+  if (!badChannelPayload_->IsModuleUsable(detId)) {
+    signal_map_type& theSignal = _signal[detId];
+    for (auto& s : theSignal) {
+      s.second.set(0.);
     }
   }
 }

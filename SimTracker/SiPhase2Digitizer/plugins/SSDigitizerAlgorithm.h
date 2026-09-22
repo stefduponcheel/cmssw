@@ -5,7 +5,7 @@
 #include "FWCore/Utilities/interface/ESGetToken.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "SimTracker/SiPhase2Digitizer/plugins/Phase2TrackerDigitizerAlgorithm.h"
-#include "CondFormats/SiStripObjects/interface/SiStripBadStrip.h"
+#include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
 
 class SSDigitizerAlgorithm : public Phase2TrackerDigitizerAlgorithm {
 public:
@@ -37,7 +37,7 @@ private:
   static constexpr float bx_time{25};
   static constexpr size_t interpolationPoints{1000};
   static constexpr int interpolationStep{10};
-  edm::ESGetToken<SiStripBadStrip, SiPhase2OuterTrackerBadStripRcd> badChannelToken_;
-  const SiStripBadStrip* badChannelPayload_;
+  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badChannelToken_;
+  const SiPixelQuality* badChannelPayload_;
 };
 #endif
