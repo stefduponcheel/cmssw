@@ -25,8 +25,10 @@ void PixelDigitizerAlgorithm::init(const edm::EventSetup& es) {
   if (use_ineff_from_db_)  // load gain calibration service fromdb...
     theSiPixelGainCalibrationService_->setESObjects(es);
 
-  if (use_deadmodule_DB_)
+  if (use_deadmodule_DB_) {
     siPixelBadModule_ = &es.getData(siPixelBadModuleToken_);
+    phase2PixelBadModulePayload_ = &es.getData(phase2PixelBadModuleToken_);
+  }
 
   if (use_LorentzAngle_DB_)  // Get Lorentz angle from DB record
     siPixelLorentzAngle_ = &es.getData(siPixelLorentzAngleToken_);
@@ -55,8 +57,10 @@ PixelDigitizerAlgorithm::PixelDigitizerAlgorithm(const edm::ParameterSet& conf, 
       timewalk_model_(
           conf.getParameter<ParameterSet>("PixelDigitizerAlgorithm").getParameter<edm::ParameterSet>("TimewalkModel")),
       geomToken_(iC.esConsumes()) {
-  if (use_deadmodule_DB_)
+  if (use_deadmodule_DB_) {
     siPixelBadModuleToken_ = iC.esConsumes();
+    phase2PixelBadModuleToken_ = iC.esConsumes();
+  }
   if (use_LorentzAngle_DB_)
     siPixelLorentzAngleToken_ = iC.esConsumes();
   pixelFlag_ = true;
@@ -256,6 +260,14 @@ bool PixelDigitizerAlgorithm::isAboveThreshold(const digitizerUtility::SimHitInf
 // -- Read Bad Channels from the Condidion DB and kill channels/module accordingly
 //
 void PixelDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
-  throw cms::Exception("PixelDigitizerAlgorithm") << "Trying to kill modules from the pixel digitizer."
-                                                  << " This method is not yet implemented!";
+  // throw cms::Exception("PixelDigitizerAlgorithm") << "Trying to kill modules from the pixel digitizer."
+  //                                                << " This method is not yet implemented!";
+  uint32_t detId = pixdet->geographicalId().rawId();
+  if (!phase2PixelBadModulePayload_->IsModuleUsable(detId)) {
+    signal_map_type& theSignal = _signal[detId];
+    for (auto& s : theSignal) {
+      s.second.set(0.);
+    }
+  }
 }
+

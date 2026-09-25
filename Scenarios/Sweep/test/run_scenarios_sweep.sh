@@ -67,6 +67,9 @@ declare -A SCENARIOS=(
   ["Ph2PSP_100"]="killAllPSp"
   ["Ph2PSS_100"]="killAllPSs"
   ["Ph2PS_100"]="killAllPS"
+  ["Ph2PXB_100"]="killAllPh2PXB"
+  ["Ph2PXF_100"]="killAllPh2PXF"
+  ["Ph2PXB3D_100"]="killAllPh2PXB3D"
 )
 
 if [ -n "${SCENARIO_FILTER}" ] && [ -z "${SCENARIOS[${SCENARIO_FILTER}]+set}" ]; then
