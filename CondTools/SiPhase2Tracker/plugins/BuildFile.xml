@@ -9,4 +9,7 @@
 <use name="CondFormats/SiPhase2TrackerObjects"/>
 <use name="CondFormats/SiStripObjects"/>
 <use name="Geometry/TrackerGeometryBuilder"/>
+<use name="Geometry/CommonTopologies"/>
+<use name="CommonTools/ConditionDBWriter"/>
+<use name="CondFormats/SiPixelObjects"/>
 <flags EDM_PLUGIN="1"/>

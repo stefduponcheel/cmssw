@@ -6,6 +6,8 @@
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "SimTracker/SiPhase2Digitizer/plugins/Phase2TrackerDigitizerAlgorithm.h"
 #include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
+#include "CondFormats/SiStripObjects/interface/SiStripBadStrip.h"
+#include "CondFormats/DataRecord/interface/SiPhase2OuterTrackerCondDataRecords.h"
 
 class SSDigitizerAlgorithm : public Phase2TrackerDigitizerAlgorithm {
 public:
@@ -27,6 +29,7 @@ private:
   bool select_hit_sampledMode(const PSimHit& hit, double tCorr, double& sigScale) const;
   bool select_hit_latchedMode(const PSimHit& hit, double tCorr, double& sigScale) const;
   void module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) override;
+  void channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet);
 
   int hitDetectionMode_;
   std::vector<double> pulseShapeVec_;
@@ -37,7 +40,9 @@ private:
   static constexpr float bx_time{25};
   static constexpr size_t interpolationPoints{1000};
   static constexpr int interpolationStep{10};
-  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badChannelToken_;
-  const SiPixelQuality* badChannelPayload_;
+  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badModuleToken_;
+  const SiPixelQuality* badModulePayload_;
+  edm::ESGetToken<SiStripBadStrip, SiPhase2OuterTrackerBadStripRcd> channelBadStripToken_;
+  const SiStripBadStrip* channelBadStripPayload_ = nullptr;
 };
 #endif

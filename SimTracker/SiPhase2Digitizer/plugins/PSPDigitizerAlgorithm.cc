@@ -18,7 +18,7 @@ void PSPDigitizerAlgorithm::init(const edm::EventSetup& es) {
   }
 
   if (use_deadmodule_DB_)  // Get module status from DB
-    badChannelPayload_ = &es.getData(badChannelToken_);
+    badModulePayload_ = &es.getData(badModuleToken_);
 
   geom_ = &es.getData(geomToken_);
 }
@@ -34,7 +34,7 @@ PSPDigitizerAlgorithm::PSPDigitizerAlgorithm(const edm::ParameterSet& conf, edm:
     siPhase2OTLorentzAngleToken_ = iC.esConsumes();
 
   if (use_deadmodule_DB_) {
-    badChannelToken_ = iC.esConsumes();
+    badModuleToken_ = iC.esConsumes();
   }
 
   pixelFlag_ = false;
@@ -93,7 +93,7 @@ bool PSPDigitizerAlgorithm::isInBiasRailRegion(const PSimHit& hit) const {
 void PSPDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
   uint32_t detId = pixdet->geographicalId().rawId();
 
-  if (!badChannelPayload_->IsModuleUsable(detId)) {
+  if (!badModulePayload_->IsModuleUsable(detId)) {
     signal_map_type& theSignal = _signal[detId];
     for (auto& s : theSignal) {
       s.second.set(0.);

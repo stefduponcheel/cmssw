@@ -23,8 +23,8 @@ public:
 private:
   edm::ESGetToken<SiPhase2OuterTrackerLorentzAngle, SiPhase2OuterTrackerLorentzAngleSimRcd> siPhase2OTLorentzAngleToken_;
   const edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
-  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badChannelToken_;
-  const SiPixelQuality* badChannelPayload_;
+  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badModuleToken_;
+  const SiPixelQuality* badModulePayload_;
   const int biasRailInefficiencyFlag_{0};
 };
 #endif

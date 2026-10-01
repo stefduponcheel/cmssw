@@ -6,6 +6,8 @@
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "SimTracker/SiPhase2Digitizer/plugins/Phase2TrackerDigitizerAlgorithm.h"
 #include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
+#include "CondFormats/SiStripObjects/interface/SiStripBadStrip.h"
+#include "CondFormats/DataRecord/interface/SiPhase2OuterTrackerCondDataRecords.h"
 
 class PSSDigitizerAlgorithm : public Phase2TrackerDigitizerAlgorithm {
 public:
@@ -18,11 +20,14 @@ public:
   bool select_hit(const PSimHit& hit, double tCorr, double& sigScale) const override;
   bool isAboveThreshold(const digitizerUtility::SimHitInfo* hitInfo, float charge, float thr) const override;
   void module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) override;
+  void channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet);
 
 private:
   edm::ESGetToken<SiPhase2OuterTrackerLorentzAngle, SiPhase2OuterTrackerLorentzAngleSimRcd> siPhase2OTLorentzAngleToken_;
   const edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
-  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badChannelToken_;
-  const SiPixelQuality* badChannelPayload_;
+  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badModuleToken_;
+  const SiPixelQuality* badModulePayload_;
+  edm::ESGetToken<SiStripBadStrip, SiPhase2OuterTrackerBadStripRcd> channelBadStripToken_;
+  const SiStripBadStrip* channelBadStripPayload_ = nullptr;
 };
 #endif
