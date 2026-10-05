@@ -43,6 +43,7 @@ Phase2TrackerDigitizerAlgorithm::Phase2TrackerDigitizerAlgorithm(const edm::Para
       use_ineff_from_db_(conf_specific.getParameter<bool>("Inefficiency_DB")),
       use_module_killing_(conf_specific.getParameter<bool>("KillModules")),    // boolean to kill or not modules
       use_deadmodule_DB_(conf_specific.getParameter<bool>("DeadModules_DB")),  // boolean to access dead modules from DB
+      use_deadchannel_DB_(conf_specific.getUntrackedParameter<bool>("DeadChannels_DB", false)), // boolean to access dead channels from DB
       // boolean to access Lorentz angle from DB
       use_LorentzAngle_DB_(conf_specific.getParameter<bool>("LorentzAngle_DB")),
 
@@ -961,6 +962,8 @@ void Phase2TrackerDigitizerAlgorithm::digitize(const Phase2TrackerGeomDetUnit* p
     else  // remove dead modules using the list in cfg file
       module_killing_conf(detID);
   }
+  if (use_deadchannel_DB_)
+    channel_killing_DB(pixdet);
 
   // Digitize if the signal is greater than threshold
   for (auto const& s : theSignal) {

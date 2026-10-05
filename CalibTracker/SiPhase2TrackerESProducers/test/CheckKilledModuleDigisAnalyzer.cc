@@ -6,7 +6,7 @@
 /**\class CheckKilledModuleDigisAnalyzer
 
  Description: Throwaway test analyzer: cross-checks that modules marked dead in
- Phase2OTQualityRcd genuinely have zero digis in the digitizer output, and that
+ SiPhase2OuterTrackerBadModuleRcd genuinely have zero digis in the digitizer output, and that
  non-killed modules aren't all empty too (a sanity check that digitization is actually
  happening, not that everything is silently empty). Not part of the physics chain.
 */
@@ -30,7 +30,7 @@ public:
 private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
-  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> qualityToken_;
+  edm::ESGetToken<SiPixelQuality, SiPhase2OuterTrackerBadModuleRcd> qualityToken_;
   edm::EDGetTokenT<edm::DetSetVector<Phase2TrackerDigi>> digiToken_;
 };
 

@@ -6,7 +6,7 @@
 /**\class CheckKilledITModuleDigisAnalyzer
 
  Description: Throwaway test analyzer: cross-checks that IT modules marked dead in
- SiPhase2ITQualityRcd genuinely have zero digis in the digitizer output (PixelDigi,
+ SiPhase2InnerTrackerBadModuleRcd genuinely have zero digis in the digitizer output (PixelDigi,
  label "Pixel"), and that non-killed modules aren't all empty too. Not part of the
  physics chain.
 */
@@ -20,7 +20,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "CondFormats/DataRecord/interface/SiPhase2ITQualityRcd.h"
+#include "CondFormats/DataRecord/interface/SiPhase2InnerTrackerCondDataRecords.h"
 #include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
 
 class CheckKilledITModuleDigisAnalyzer : public edm::one::EDAnalyzer<> {
@@ -30,7 +30,7 @@ public:
 private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
-  edm::ESGetToken<SiPixelQuality, SiPhase2ITQualityRcd> qualityToken_;
+  edm::ESGetToken<SiPixelQuality, SiPhase2InnerTrackerBadModuleRcd> qualityToken_;
   edm::EDGetTokenT<edm::DetSetVector<PixelDigi>> digiToken_;
 };
 

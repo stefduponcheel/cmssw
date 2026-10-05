@@ -66,7 +66,6 @@ private:
   // Gap of np column
   const float np_column_gap_;
 
-  edm::ESGetToken<SiPixelQuality, SiPixelQualityRcd> siPixelBadModuleToken_;
   edm::ESGetToken<SiPixelLorentzAngle, SiPixelLorentzAngleSimRcd> siPixelLorentzAngleToken_;
   const edm::ESGetToken<SiPixelFedCablingMap, SiPixelFedCablingMapRcd> fedCablingMapToken_;
   const edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;

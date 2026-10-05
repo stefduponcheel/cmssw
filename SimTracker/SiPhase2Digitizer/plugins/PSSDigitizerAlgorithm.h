@@ -20,12 +20,12 @@ public:
   bool select_hit(const PSimHit& hit, double tCorr, double& sigScale) const override;
   bool isAboveThreshold(const digitizerUtility::SimHitInfo* hitInfo, float charge, float thr) const override;
   void module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) override;
-  void channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet);
+  void channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) override;
 
 private:
   edm::ESGetToken<SiPhase2OuterTrackerLorentzAngle, SiPhase2OuterTrackerLorentzAngleSimRcd> siPhase2OTLorentzAngleToken_;
   const edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
-  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badModuleToken_;
+  edm::ESGetToken<SiPixelQuality, SiPhase2OuterTrackerBadModuleRcd> badModuleToken_;
   const SiPixelQuality* badModulePayload_;
   edm::ESGetToken<SiStripBadStrip, SiPhase2OuterTrackerBadStripRcd> channelBadStripToken_;
   const SiStripBadStrip* channelBadStripPayload_ = nullptr;

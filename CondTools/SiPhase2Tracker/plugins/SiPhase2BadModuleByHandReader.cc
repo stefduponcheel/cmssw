@@ -22,7 +22,7 @@
 
 #include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
 #include "CondFormats/DataRecord/interface/SiPhase2OuterTrackerCondDataRecords.h"
-#include "CondFormats/DataRecord/interface/SiPhase2ITQualityRcd.h"
+#include "CondFormats/DataRecord/interface/SiPhase2InnerTrackerCondDataRecords.h"
 
 #include "DataFormats/DetId/interface/DetId.h"
 
@@ -49,7 +49,7 @@ public:
   explicit SiPhase2BadModuleByHandReader(const edm::ParameterSet& iConfig)
       : printdebug_(iConfig.getUntrackedParameter<bool>("printDebug", true)),
         geomToken_(esConsumes()),
-        badModuleToken_(esConsumes()) {}
+        badModuleToken_(esConsumes(edm::ESInputTag{"", iConfig.getUntrackedParameter<std::string>("label", "")})) {}
 
   ~SiPhase2BadModuleByHandReader() override = default;
   void analyze(edm::StreamID, edm::Event const&, edm::EventSetup const&) const override;
@@ -67,17 +67,17 @@ template <typename RecordT>
 std::string SiPhase2BadModuleByHandReader<RecordT>::moduleTypeToString(TrackerGeometry::ModuleType type) {
   switch (type) {
     case TrackerGeometry::ModuleType::Ph2SS:
-      return "Ph2SS (OT 2S)";
+      return "Ph2SS";
     case TrackerGeometry::ModuleType::Ph2PSP:
-      return "Ph2PSP (OT PS macro-pixel)";
+      return "Ph2PSP";
     case TrackerGeometry::ModuleType::Ph2PSS:
-      return "Ph2PSS (OT PS strip)";
+      return "Ph2PSS";
     case TrackerGeometry::ModuleType::Ph2PXB:
-      return "Ph2PXB (IT planar barrel)";
+      return "Ph2PXB";
     case TrackerGeometry::ModuleType::Ph2PXF:
-      return "Ph2PXF (IT planar forward)";
+      return "Ph2PXF";
     case TrackerGeometry::ModuleType::Ph2PXB3D:
-      return "Ph2PXB3D (IT 3D pair)";
+      return "Ph2PXB3D";
     default:
       return "unknown";
   }
@@ -88,12 +88,9 @@ void SiPhase2BadModuleByHandReader<RecordT>::analyze(edm::StreamID,
                                                        edm::Event const&,
                                                        edm::EventSetup const& iSetup) const {
   const auto& tkGeom = iSetup.getData(geomToken_);
-  const auto& payload = iSetup.getData(badModuleToken_);
+  const auto& payload = iSetup.getData(badModuleToken_);  
 
-  // OT pairing isn't derivable from DetId adjacency the way IT's Ph2PXB3D is --
-  // a stack's two sensors can land at arbitrary, unrelated DetId values. Build
-  // a one-time sibling lookup from the real geometry instead: for every
-  // StackGeomDet, its lowerDet()/upperDet() are each other's partner.
+  // Find the ID's in the OT stack
   std::map<uint32_t, uint32_t> otSiblingOf;
   for (auto const* det : tkGeom.dets()) {
     if (const StackGeomDet* stack = dynamic_cast<const StackGeomDet*>(det)) {
@@ -139,11 +136,12 @@ template <typename RecordT>
 void SiPhase2BadModuleByHandReader<RecordT>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.addUntracked<bool>("printDebug", true);
+  desc.addUntracked<std::string>("label", "");
   descriptions.addWithDefaultLabel(desc);
 }
 
-using SiPhase2OTBadModuleReader = SiPhase2BadModuleByHandReader<Phase2OTQualityRcd>;
-using SiPhase2ITBadModuleReader = SiPhase2BadModuleByHandReader<SiPhase2ITQualityRcd>;
+using SiPhase2OTBadModuleReader = SiPhase2BadModuleByHandReader<SiPhase2OuterTrackerBadModuleRcd>;
+using SiPhase2ITBadModuleReader = SiPhase2BadModuleByHandReader<SiPhase2InnerTrackerBadModuleRcd>;
 
 #include "FWCore/PluginManager/interface/ModuleDef.h"
 #include "FWCore/Framework/interface/MakerMacros.h"

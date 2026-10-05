@@ -29,7 +29,7 @@ process.SiPhase2ITFakeQualityESSource = cms.ESSource("SiPhase2ITFakeQualityESSou
 )
 process.get = cms.EDAnalyzer("EventSetupRecordDataGetter",
     toGet = cms.VPSet(
-        cms.PSet(record = cms.string("SiPhase2ITQualityRcd"), data = cms.vstring("SiPixelQuality/"))
+        cms.PSet(record = cms.string("SiPhase2InnerTrackerBadModuleRcd"), data = cms.vstring("SiPixelQuality/"))
     ),
     verbose = cms.untracked.bool(True)
 )

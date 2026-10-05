@@ -31,8 +31,8 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     DBParameters = cms.PSet(authenticationPath = cms.untracked.string('')),
     connect = cms.string('sqlite_file:BadModulesByHand_v0.db'),
     toPut = cms.VPSet(
-        cms.PSet(record = cms.string('Phase2OTQualityRcd'), tag = cms.string('Phase2OTBadModulesByHand_v0')),
-        cms.PSet(record = cms.string('SiPhase2ITQualityRcd'), tag = cms.string('Phase2ITBadModulesByHand_v0')),
+        cms.PSet(record = cms.string('SiPhase2OuterTrackerBadModuleRcd'), tag = cms.string('Phase2OTBadModulesByHand_v0')),
+        cms.PSet(record = cms.string('SiPhase2InnerTrackerBadModuleRcd'), tag = cms.string('Phase2ITBadModulesByHand_v0')),
     )
 )
 
@@ -44,22 +44,22 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
 _exampleListFile = os.path.join(os.environ['CMSSW_BASE'], 'src/CondTools/SiPhase2Tracker/data/dead_modules_example.txt')
 
 process.otBadModuleBuilder = cms.EDAnalyzer("SiPhase2BadModuleByHandBuilder",
-    Record = cms.string('Phase2OTQualityRcd'),
+    Record = cms.string('SiPhase2OuterTrackerBadModuleRcd'),
     SinceAppendMode = cms.bool(True),
     IOVMode = cms.string('Run'),
     doStoreOnDB = cms.bool(True),
     badModuleListFile = cms.untracked.string(_exampleListFile),
-    targetRecord = cms.untracked.string("Phase2OTQualityRcd"),
+    targetRecord = cms.untracked.string("SiPhase2OuterTrackerBadModuleRcd"),
     printDebug = cms.untracked.bool(True),
 )
 
 process.itBadModuleBuilder = cms.EDAnalyzer("SiPhase2BadModuleByHandBuilder",
-    Record = cms.string('SiPhase2ITQualityRcd'),
+    Record = cms.string('SiPhase2InnerTrackerBadModuleRcd'),
     SinceAppendMode = cms.bool(True),
     IOVMode = cms.string('Run'),
     doStoreOnDB = cms.bool(True),
     badModuleListFile = cms.untracked.string(_exampleListFile),
-    targetRecord = cms.untracked.string("SiPhase2ITQualityRcd"),
+    targetRecord = cms.untracked.string("SiPhase2InnerTrackerBadModuleRcd"),
     printDebug = cms.untracked.bool(True),
 )
 

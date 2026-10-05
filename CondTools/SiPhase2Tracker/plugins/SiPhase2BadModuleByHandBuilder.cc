@@ -91,7 +91,7 @@ std::vector<uint32_t> SiPhase2BadModuleByHandBuilder::expandToFullModule(uint32_
   }
   const StackGeomDet* stack = dynamic_cast<const StackGeomDet*>(det);
   bool isOTModule = stack != nullptr;
-  bool isOTRecord = (targetRecord_ == "Phase2OTQualityRcd");
+  bool isOTRecord = (targetRecord_ == "SiPhase2OuterTrackerBadModuleRcd");
   if (isOTModule != isOTRecord) {
     return {};  // wrong subsystem for this job instance, skip
   }
@@ -158,11 +158,11 @@ std::unique_ptr<SiPixelQuality> SiPhase2BadModuleByHandBuilder::getNewObject() {
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void SiPhase2BadModuleByHandBuilder::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
-  desc.setComment("Builds a SiPixelQuality payload from a hand-specified list of dead Phase-2 module DetIds.");
+  desc.setComment("Builds a SiPixelQuality payload from a hand-specified list of Phase-2 module DetIds.");
   ConditionDBWriter::fillPSetDescription(desc);
   desc.addUntracked<bool>("printDebug", true);
   desc.addUntracked<std::string>("badModuleListFile")->setComment("Path to a plain text file, one representative bad-module DetId per line");
-  desc.addUntracked<std::string>("targetRecord")->setComment("Record to write this payload under, e.g. Phase2OTQualityRcd or Phase2ITQualityRcd");
+  desc.addUntracked<std::string>("targetRecord")->setComment("Record to write this payload under, e.g. SiPhase2OuterTrackerBadModuleRcd or SiPhase2InnerTrackerBadModuleRcd");
   descriptions.addWithDefaultLabel(desc);
 }
 

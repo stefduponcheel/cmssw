@@ -29,7 +29,7 @@ private:
   bool select_hit_sampledMode(const PSimHit& hit, double tCorr, double& sigScale) const;
   bool select_hit_latchedMode(const PSimHit& hit, double tCorr, double& sigScale) const;
   void module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) override;
-  void channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet);
+  void channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) override;
 
   int hitDetectionMode_;
   std::vector<double> pulseShapeVec_;
@@ -40,7 +40,7 @@ private:
   static constexpr float bx_time{25};
   static constexpr size_t interpolationPoints{1000};
   static constexpr int interpolationStep{10};
-  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> badModuleToken_;
+  edm::ESGetToken<SiPixelQuality, SiPhase2OuterTrackerBadModuleRcd> badModuleToken_;
   const SiPixelQuality* badModulePayload_;
   edm::ESGetToken<SiStripBadStrip, SiPhase2OuterTrackerBadStripRcd> channelBadStripToken_;
   const SiStripBadStrip* channelBadStripPayload_ = nullptr;

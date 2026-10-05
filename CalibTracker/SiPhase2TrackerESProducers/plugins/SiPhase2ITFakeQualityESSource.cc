@@ -30,7 +30,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
 #include "FWCore/Utilities/interface/Exception.h"
 
-#include "CondFormats/DataRecord/interface/SiPhase2ITQualityRcd.h"
+#include "CondFormats/DataRecord/interface/SiPhase2InnerTrackerCondDataRecords.h"
 #include "CondFormats/SiPixelObjects/interface/SiPixelQuality.h"
 
 #include "Geometry/CommonTopologies/interface/StackGeomDet.h"
@@ -46,7 +46,7 @@ public:
   ~SiPhase2ITFakeQualityESSource() override = default;
 
   using ReturnType = std::unique_ptr<SiPixelQuality>;
-  ReturnType produce(const SiPhase2ITQualityRcd&);
+  ReturnType produce(const SiPhase2InnerTrackerBadModuleRcd&);
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -91,7 +91,7 @@ SiPhase2ITFakeQualityESSource::SiPhase2ITFakeQualityESSource(const edm::Paramete
           << "killSpecs moduleType must be one of Ph2PXB, Ph2PXF, Ph2PXB3D, but is " << moduleType;
     }
   }
-  findingRecord<SiPhase2ITQualityRcd>();
+  findingRecord<SiPhase2InnerTrackerBadModuleRcd>();
   }
 
   void SiPhase2ITFakeQualityESSource::setIntervalFor(const edm::eventsetup::EventSetupRecordKey&,
@@ -134,7 +134,7 @@ std::vector<const GeomDet*> SiPhase2ITFakeQualityESSource::selectRandomModules(c
   shuffled.resize(numToSelect);
   return shuffled;
 }
-SiPhase2ITFakeQualityESSource::ReturnType SiPhase2ITFakeQualityESSource::produce(const SiPhase2ITQualityRcd& iRecord) {
+SiPhase2ITFakeQualityESSource::ReturnType SiPhase2ITFakeQualityESSource::produce(const SiPhase2InnerTrackerBadModuleRcd& iRecord) {
   const auto& geomRcd = iRecord.getRecord<TrackerDigiGeometryRecord>();
   const TrackerGeometry& tGeom = geomRcd.get(geomToken_);
   

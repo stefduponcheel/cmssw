@@ -6,7 +6,7 @@
 /**\class TestPhase2OTQualityAnalyzer
 
  Description: Throwaway test analyzer: requests the SiPixelQuality product from
- Phase2OTQualityRcd once per event, purely to trigger
+ SiPhase2OuterTrackerBadModuleRcd once per event, purely to trigger
  SiPhase2OTFakeQualityESSource::produce() so its debug output can be inspected.
  Not part of the physics chain.
 */
@@ -29,7 +29,7 @@ public:
 
 private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
-  edm::ESGetToken<SiPixelQuality, Phase2OTQualityRcd> qualityToken_;
+  edm::ESGetToken<SiPixelQuality, SiPhase2OuterTrackerBadModuleRcd> qualityToken_;
   edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
 };
 

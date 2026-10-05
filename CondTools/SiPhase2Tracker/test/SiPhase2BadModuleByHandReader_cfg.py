@@ -34,15 +34,15 @@ process.CondDB.connect = 'sqlite_file:BadModulesByHand_v0.db'
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     process.CondDB,
     toGet = cms.VPSet(
-        cms.PSet(record = cms.string('Phase2OTQualityRcd'), tag = cms.string('Phase2OTBadModulesByHand_v0')),
-        cms.PSet(record = cms.string('SiPhase2ITQualityRcd'), tag = cms.string('Phase2ITBadModulesByHand_v0')),
+        cms.PSet(record = cms.string('SiPhase2OuterTrackerBadModuleRcd'), tag = cms.string('Phase2OTBadModulesByHand_v0')),
+        cms.PSet(record = cms.string('SiPhase2InnerTrackerBadModuleRcd'), tag = cms.string('Phase2ITBadModulesByHand_v0')),
     )
 )
 
 process.get = cms.EDAnalyzer("EventSetupRecordDataGetter",
     toGet = cms.VPSet(
-        cms.PSet(record = cms.string('Phase2OTQualityRcd'), data = cms.vstring('SiPixelQuality')),
-        cms.PSet(record = cms.string('SiPhase2ITQualityRcd'), data = cms.vstring('SiPixelQuality')),
+        cms.PSet(record = cms.string('SiPhase2OuterTrackerBadModuleRcd'), data = cms.vstring('SiPixelQuality')),
+        cms.PSet(record = cms.string('SiPhase2InnerTrackerBadModuleRcd'), data = cms.vstring('SiPixelQuality')),
     ),
     verbose = cms.untracked.bool(True)
 )

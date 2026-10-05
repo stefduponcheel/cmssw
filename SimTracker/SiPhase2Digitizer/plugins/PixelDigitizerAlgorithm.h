@@ -4,7 +4,7 @@
 #include "CondFormats/SiPixelObjects/interface/GlobalPixel.h"
 #include "CondFormats/DataRecord/interface/SiPixelQualityRcd.h"
 #include "CondFormats/DataRecord/interface/SiPixelLorentzAngleSimRcd.h"
-#include "CondFormats/DataRecord/interface/SiPhase2ITQualityRcd.h"
+#include "CondFormats/DataRecord/interface/SiPhase2InnerTrackerCondDataRecords.h"
 #include "FWCore/Utilities/interface/ESGetToken.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "SimTracker/SiPhase2Digitizer/plugins/Phase2TrackerDigitizerAlgorithm.h"
@@ -62,10 +62,9 @@ public:
   bool apply_timewalk_;
   const TimewalkModel timewalk_model_;
 
-  edm::ESGetToken<SiPixelQuality, SiPixelQualityRcd> siPixelBadModuleToken_;  // real conditions token, left untouched
-  edm::ESGetToken<SiPixelQuality, SiPhase2ITQualityRcd> phase2PixelBadModuleToken_;
+  edm::ESGetToken<SiPixelQuality, SiPhase2InnerTrackerBadModuleRcd> badModuleToken_;
   edm::ESGetToken<SiPixelLorentzAngle, SiPixelLorentzAngleSimRcd> siPixelLorentzAngleToken_;
   const edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> geomToken_;
-  const SiPixelQuality* phase2PixelBadModulePayload_ = nullptr;
+  const SiPixelQuality* badModulePayload_ = nullptr;
 };
 #endif

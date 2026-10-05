@@ -88,9 +88,6 @@ protected:
   // Accessing Outer Tracker Lorentz angle from DB:
   const SiPhase2OuterTrackerLorentzAngle* siPhase2OTLorentzAngle_;
 
-  // Accessing Dead pixel modules from DB:
-  const SiPixelQuality* siPixelBadModule_;
-
   // Accessing Map and Geom:
   const TrackerGeometry* geom_;
   struct SubdetEfficiencies {
@@ -113,6 +110,7 @@ protected:
   const bool use_ineff_from_db_;
   const bool use_module_killing_;   // remove or not the dead pixel modules
   const bool use_deadmodule_DB_;    // if we want to get dead pixel modules from the DataBase.
+  const bool use_deadchannel_DB_;   // if we want to get dead channels from the DataBase.
   const bool use_LorentzAngle_DB_;  // if we want to get Lorentz angle from the DataBase.
 
   const Parameters deadModules_;
@@ -225,6 +223,8 @@ protected:
   virtual void module_killing_conf(uint32_t detID);
   // remove dead modules uisng the list in the DB
   virtual void module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) = 0;
+  // remove dead channels using the DB; only algorithms with channel-level payloads override this
+  virtual void channel_killing_DB(const Phase2TrackerGeomDetUnit*) {}
 
   const SubdetEfficiencies subdetEfficiencies_;
   float calcQ(float x);

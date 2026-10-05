@@ -34,7 +34,9 @@ PSPDigitizerAlgorithm::PSPDigitizerAlgorithm(const edm::ParameterSet& conf, edm:
     siPhase2OTLorentzAngleToken_ = iC.esConsumes();
 
   if (use_deadmodule_DB_) {
-    badModuleToken_ = iC.esConsumes();
+    std::string badModuleLabel_ = conf.getParameter<ParameterSet>("PSPDigitizerAlgorithm")
+                                      .getUntrackedParameter<std::string>("BadModuleLabel", "");
+    badModuleToken_ = iC.esConsumes(edm::ESInputTag{"", badModuleLabel_});
   }
 
   pixelFlag_ = false;

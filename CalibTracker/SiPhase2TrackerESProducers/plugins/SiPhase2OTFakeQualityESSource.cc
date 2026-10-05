@@ -54,7 +54,7 @@ public:
   ~SiPhase2OTFakeQualityESSource() override = default;
 
   using ReturnType = std::unique_ptr<SiPixelQuality>;
-  ReturnType produce(const Phase2OTQualityRcd&);
+  ReturnType produce(const SiPhase2OuterTrackerBadModuleRcd&);
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -101,7 +101,7 @@ SiPhase2OTFakeQualityESSource::SiPhase2OTFakeQualityESSource(const edm::Paramete
     }
   }
 
-  findingRecord<Phase2OTQualityRcd>();
+  findingRecord<SiPhase2OuterTrackerBadModuleRcd>();
 }
 
 void SiPhase2OTFakeQualityESSource::setIntervalFor(const edm::eventsetup::EventSetupRecordKey&,
@@ -154,7 +154,7 @@ std::vector<const StackGeomDet*> SiPhase2OTFakeQualityESSource::selectRandomStac
   return shuffled;
 }
 
-SiPhase2OTFakeQualityESSource::ReturnType SiPhase2OTFakeQualityESSource::produce(const Phase2OTQualityRcd& iRecord) {
+SiPhase2OTFakeQualityESSource::ReturnType SiPhase2OTFakeQualityESSource::produce(const SiPhase2OuterTrackerBadModuleRcd& iRecord) {
   const auto& geomRcd = iRecord.getRecord<TrackerDigiGeometryRecord>();
   const TrackerGeometry& tGeom = geomRcd.get(geomToken_);
 
