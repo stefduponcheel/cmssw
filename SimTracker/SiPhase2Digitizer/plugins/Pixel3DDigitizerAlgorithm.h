@@ -12,7 +12,6 @@
 //          Clara Lasaosa Garcia (IFCA)
 //--------------------------------------------------------------
 
-#include "CondFormats/DataRecord/interface/SiPixelQualityRcd.h"
 #include "CondFormats/DataRecord/interface/SiPixelFedCablingMapRcd.h"
 #include "CondFormats/DataRecord/interface/SiPixelLorentzAngleSimRcd.h"
 #include "CondFormats/SiPixelObjects/interface/SiPixelFedCablingMap.h"

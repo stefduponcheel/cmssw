@@ -31,13 +31,11 @@ void SSDigitizerAlgorithm::init(const edm::EventSetup& es) {
   if (use_LorentzAngle_DB_)  // Get Lorentz angle from DB record
     siPhase2OTLorentzAngle_ = &es.getData(siPhase2OTLorentzAngleToken_);
 
-  if (use_deadmodule_DB_) {
+  if (use_deadmodule_DB_)  // Get module status from DB
     badModulePayload_ = &es.getData(badModuleToken_);
-  }
 
-  if (use_deadchannel_DB_) {  // Get Bad Channel (SiStripBadStrip) from DB
+  if (use_deadchannel_DB_)  // Get Bad Channel (SiStripBadStrip) from DB
     channelBadStripPayload_ = &es.getData(channelBadStripToken_);
-  }
 
   geom_ = &es.getData(geomToken_);
 }
@@ -214,8 +212,8 @@ void SSDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pix
       s.second.set(0.);
     }
   }
-
 }
+
 void SSDigitizerAlgorithm::channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
   uint32_t detId = pixdet->geographicalId().rawId();
 

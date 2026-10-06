@@ -2,7 +2,6 @@
 #define _SimTracker_SiPhase2Digitizer_PixelDigitizerAlgorithm_h
 
 #include "CondFormats/SiPixelObjects/interface/GlobalPixel.h"
-#include "CondFormats/DataRecord/interface/SiPixelQualityRcd.h"
 #include "CondFormats/DataRecord/interface/SiPixelLorentzAngleSimRcd.h"
 #include "CondFormats/DataRecord/interface/SiPhase2InnerTrackerCondDataRecords.h"
 #include "FWCore/Utilities/interface/ESGetToken.h"

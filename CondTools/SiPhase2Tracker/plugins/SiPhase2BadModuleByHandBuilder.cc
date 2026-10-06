@@ -5,10 +5,10 @@
 //
 /**\class SiPhase2BadModuleByHandBuilder SiPhase2BadModuleByHandBuilder.cc CondTools/SiPhase2Tracker/plugins/SiPhase2BadModuleByHandBuilder.cc
 
- Description: [one line class summary]
+ Description: Translates a hand-specified text list of representative Phase-2 dead-module DetIds into a SiPixelQuality payload and writes it to sqlite under one target record. OT and IT are handled by separate job instances that share the same list.
 
  Implementation:
-     [Notes on implementation]
+     Each DetId is expanded to its full physical module: OT stacks to both sensors via StackGeomDet, IT Ph2PXB3D pairs to the partner DetId by parity. Entries that belong to the other subsystem are skipped based on targetRecord.
 */
 //
 // Original Author:  Stef Duponcheel
@@ -38,7 +38,6 @@
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
 #include "Geometry/CommonTopologies/interface/StackGeomDet.h"
-
 
 //
 // class declaration
@@ -161,11 +160,12 @@ void SiPhase2BadModuleByHandBuilder::fillDescriptions(edm::ConfigurationDescript
   desc.setComment("Builds a SiPixelQuality payload from a hand-specified list of Phase-2 module DetIds.");
   ConditionDBWriter::fillPSetDescription(desc);
   desc.addUntracked<bool>("printDebug", true);
-  desc.addUntracked<std::string>("badModuleListFile")->setComment("Path to a plain text file, one representative bad-module DetId per line");
-  desc.addUntracked<std::string>("targetRecord")->setComment("Record to write this payload under, e.g. SiPhase2OuterTrackerBadModuleRcd or SiPhase2InnerTrackerBadModuleRcd");
+  desc.addUntracked<std::string>("badModuleListFile")
+      ->setComment("Path to a plain text file, one representative bad-module DetId per line");
+  desc.addUntracked<std::string>("targetRecord")
+      ->setComment("Record to write this payload under, e.g. SiPhase2OuterTrackerBadModuleRcd or SiPhase2InnerTrackerBadModuleRcd");
   descriptions.addWithDefaultLabel(desc);
 }
-
 
 //define this as a plug-in
 #include "FWCore/PluginManager/interface/ModuleDef.h"

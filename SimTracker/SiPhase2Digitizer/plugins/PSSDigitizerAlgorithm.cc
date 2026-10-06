@@ -18,13 +18,11 @@ void PSSDigitizerAlgorithm::init(const edm::EventSetup& es) {
   if (use_LorentzAngle_DB_)  // Get Lorentz angle from DB record
     siPhase2OTLorentzAngle_ = &es.getData(siPhase2OTLorentzAngleToken_);
 
-  if (use_deadmodule_DB_) {  // Get Bad Module (SiPixelQuality) from DB
+  if (use_deadmodule_DB_)  // Get module status from DB
     badModulePayload_ = &es.getData(badModuleToken_);
-  }
 
-  if (use_deadchannel_DB_) {  // Get Bad Channel (SiStripBadStrip) from DB
+  if (use_deadchannel_DB_)  // Get Bad Channel (SiStripBadStrip) from DB
     channelBadStripPayload_ = &es.getData(channelBadStripToken_);
-  }
 
   geom_ = &es.getData(geomToken_);
 }
@@ -43,8 +41,6 @@ PSSDigitizerAlgorithm::PSSDigitizerAlgorithm(const edm::ParameterSet& conf, edm:
   }
 
   if (use_deadchannel_DB_) {
-    // Reads from this algorithm's own PSet, unlike the original code which read
-    // BadChannelLabel from SSDigitizerAlgorithm's PSet by mistake.
     std::string badChannelLabel_ = conf.getParameter<ParameterSet>("PSSDigitizerAlgorithm")
                                        .getUntrackedParameter<std::string>("BadChannelLabel", "");
     channelBadStripToken_ = iC.esConsumes(edm::ESInputTag{"", badChannelLabel_});
@@ -87,8 +83,8 @@ void PSSDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pi
       s.second.set(0.);
     }
   }
-
 }
+
 void PSSDigitizerAlgorithm::channel_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
   uint32_t detId = pixdet->geographicalId().rawId();
 

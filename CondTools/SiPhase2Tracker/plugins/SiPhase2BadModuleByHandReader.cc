@@ -5,10 +5,10 @@
 //
 /**\class SiPhase2BadModuleByHandReader SiPhase2BadModuleByHandReader.cc CondTools/SiPhase2Tracker/plugins/SiPhase2BadModuleByHandReader.cc
 
- Description: [one line class summary]
+ Description: Reads back a SiPixelQuality dead-module payload from the EventSetup and prints each DetId with its module type and any paired sensor. Templated over the record type; OT and IT instances are provided.
 
  Implementation:
-     [Notes on implementation]
+     Verification tool for the builder output. The OT pairing uses a sibling map built from StackGeomDet, and IT Ph2PXB3D pairs use DetId parity.
 */
 //
 // Original Author:  Stef Duponcheel
@@ -29,7 +29,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/global/EDAnalyzer.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -88,7 +87,7 @@ void SiPhase2BadModuleByHandReader<RecordT>::analyze(edm::StreamID,
                                                        edm::Event const&,
                                                        edm::EventSetup const& iSetup) const {
   const auto& tkGeom = iSetup.getData(geomToken_);
-  const auto& payload = iSetup.getData(badModuleToken_);  
+  const auto& payload = iSetup.getData(badModuleToken_);
 
   // Find the ID's in the OT stack
   std::map<uint32_t, uint32_t> otSiblingOf;

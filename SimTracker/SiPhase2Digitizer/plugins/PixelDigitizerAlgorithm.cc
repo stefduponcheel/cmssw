@@ -25,9 +25,8 @@ void PixelDigitizerAlgorithm::init(const edm::EventSetup& es) {
   if (use_ineff_from_db_)  // load gain calibration service fromdb...
     theSiPixelGainCalibrationService_->setESObjects(es);
 
-  if (use_deadmodule_DB_) {
+  if (use_deadmodule_DB_)
     badModulePayload_ = &es.getData(badModuleToken_);
-  }
 
   if (use_LorentzAngle_DB_)  // Get Lorentz angle from DB record
     siPixelLorentzAngle_ = &es.getData(siPixelLorentzAngleToken_);
@@ -257,7 +256,7 @@ bool PixelDigitizerAlgorithm::isAboveThreshold(const digitizerUtility::SimHitInf
     return true;
 }
 //
-// Read bad modules from the Condition DB and modules accordingly
+// -- Read module status from the Condition DB and kill the whole module's signal if dead
 //
 void PixelDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* pixdet) {
   uint32_t detId = pixdet->geographicalId().rawId();
@@ -268,4 +267,3 @@ void PixelDigitizerAlgorithm::module_killing_DB(const Phase2TrackerGeomDetUnit* 
     }
   }
 }
-
